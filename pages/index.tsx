@@ -1,12 +1,11 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import Image from 'next/image'
-import Products from '../components/products/Products'
+import ProductsCard from '../components/products/ProductsCard'
 import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => {
   return (
-    <div className={styles.container}>
+    <div>
       <Head>
         <title>MARSH COOP</title>
         <meta name="description" content="MARSH COOP" />
@@ -18,7 +17,7 @@ const Home: NextPage = () => {
 
         <div className={styles.grid}>
           <a href="/products" className={styles.card}>
-            <Products />
+            <ProductsCard />
           </a>
         </div>
       </main>
