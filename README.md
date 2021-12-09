@@ -1,16 +1,25 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# MARSHCOOP
 
-## Getting Started
+## devel
 
-First, run the development server:
+create an `.env.local` file with the requsite ENV variables:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON=
+```
+
+**note:** `NEXT_PUBLIC_` prefix so is available browser-side.
+
+run a development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+open [http://localhost:3000](http://localhost:3000) with a browser.
+
+## nextJS stuff:
 
 You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
 
