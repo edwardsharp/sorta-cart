@@ -1,23 +1,23 @@
-import { useCallback, useEffect, useState } from 'react'
-import { getProducts, Product } from '../../services/products'
+import { useCallback, useEffect, useState, Suspense } from 'react'
+import { getProductsSuspense, Product } from '../../services/products'
 
-export default function ProductsCard() {
-  const [products, setProducts] = useState<Product[]>([])
+const resource = getProductsSuspense()
 
-  const fetchProducts = useCallback(async () => {
-    const { data, error } = await getProducts()
-    if (!error && data && data.length) {
-      setProducts(data)
-    }
-  }, [])
+function ProductsCard() {
+  const products = resource.read()
 
-  useEffect(() => {
-    fetchProducts()
-  }, [])
   return (
     <>
       <h2>Products</h2>
       <p>{products && products.length}</p>
     </>
+  )
+}
+
+export default function ProductsCardSuspense() {
+  return (
+    <Suspense fallback={<h2>loading products...</h2>}>
+      <ProductsCard />
+    </Suspense>
   )
 }
