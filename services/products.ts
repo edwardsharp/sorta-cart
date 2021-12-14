@@ -10,6 +10,6 @@ export async function getProducts(limit = 1000) {
     .select()
     .limit(limit)
 
-  if (error) throw error.message
+  if (error) throw new Error(error.message)
   return products
 }
