@@ -1,23 +1,18 @@
-import { useCallback, useEffect, useState, Suspense } from 'react'
-import { getProductsSuspense, Product } from '../../services/products'
+import React from 'react'
+import useSWR from 'swr'
 
-const resource = getProductsSuspense()
+import { getProducts } from '../../services/products'
 
-function ProductsCard() {
-  const products = resource.read()
+export default function ProductsCard() {
+  const { data: products, error } = useSWR('get_products', getProducts)
+
+  if (error) return <div>failed to load</div>
+  if (!products) return <div>loading...</div>
 
   return (
     <>
       <h2>Products</h2>
       <p>{products && products.length}</p>
     </>
-  )
-}
-
-export default function ProductsCardSuspense() {
-  return (
-    <Suspense fallback={<h2>loading products...</h2>}>
-      <ProductsCard />
-    </Suspense>
   )
 }

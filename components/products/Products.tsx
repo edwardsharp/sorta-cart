@@ -1,19 +1,16 @@
-import { useCallback, useEffect, useState } from 'react'
-import { getProducts, Product } from '../../services/products'
+import React from 'react'
+import useSWR from 'swr'
+
+import { getProducts } from '../../services/products'
 
 export default function Products() {
-  const [products, setProducts] = useState<Product[]>([])
+  const { data: products, error } = useSWR('get_products', () =>
+    getProducts(10)
+  )
 
-  const fetchProducts = useCallback(async () => {
-    const { data, error } = await getProducts(10)
-    if (!error && data && data.length) {
-      setProducts(data)
-    }
-  }, [])
+  if (error) return <div>failed to load</div>
+  if (!products) return <div>loading...</div>
 
-  useEffect(() => {
-    fetchProducts()
-  }, [])
   return (
     <>
       <h2>{products.length} Products</h2>
