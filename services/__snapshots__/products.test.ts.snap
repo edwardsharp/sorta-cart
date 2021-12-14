@@ -1,5 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`products service getCategories 1`] = `
+Object {
+  "category": "MUTUAL AID",
+}
+`;
+
 exports[`products service getProducts matches snapshot 1`] = `
 Array [
   Object {

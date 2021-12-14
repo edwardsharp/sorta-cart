@@ -1,4 +1,4 @@
-import { getProducts } from './products'
+import { getCategories, getProducts } from './products'
 
 describe('products service', () => {
   test('getProducts matches snapshot', async () => {
@@ -15,5 +15,10 @@ describe('products service', () => {
   test('getProducts throws', async () => {
     // note: jest needs whatever fn that throws to be wrapped in a fn, so the lambda here:
     await expect(async () => await getProducts(-1)).rejects.toThrow()
+  })
+
+  test('getCategories', async () => {
+    const categories = await getCategories()
+    expect(categories).toMatchSnapshot()
   })
 })
