@@ -2,7 +2,7 @@
 
 ## devel
 
-create an `.env.local` file with the requsite ENV variables:
+create an `.env.local` (additionally `.env.test` for jest tests) file with the requsite ENV variables:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=
