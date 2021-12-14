@@ -9,25 +9,35 @@ export default function Products() {
   )
 
   if (error) return <div>failed to load</div>
-  if (!products) return <div>loading...</div>
+  if (!products) return <div>loading . . .</div>
 
   return (
     <>
       <h2>{products.length} Products</h2>
-      {products &&
-        products.map((product) => (
-          <div key={product.id}>
-            <dl>
-              {Object.entries(product).map((entry) => (
-                <div key={`${product.id}${entry[0]}`}>
-                  <dt>{entry[0]}</dt>
-                  <dd>{entry[1]}</dd>
-                </div>
+      <table>
+        <thead>
+          {products[0] && (
+            <tr>
+              {Object.keys(products[0]).map((k) => (
+                <td key={`${k}`}>
+                  <dd>{k}</dd>
+                </td>
               ))}
-            </dl>
-            <hr />
-          </div>
-        ))}
+            </tr>
+          )}
+        </thead>
+        <tbody>
+          {products.map((product) => (
+            <tr key={product.id}>
+              {Object.values(product).map((v) => (
+                <td key={`${product.id}${v}`}>
+                  <dd>{v}</dd>
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </>
   )
 }
