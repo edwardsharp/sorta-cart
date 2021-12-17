@@ -1,7 +1,7 @@
 import React from 'react'
 import useSWR from 'swr'
 
-import { getProducts } from '../../services/products'
+import { getProducts } from '../../services/supabase/products'
 
 export default function ProductsCard() {
   const { data: products, error } = useSWR('get_products_card', getProducts)

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { defaultCorsMiddleware } from '../../lib/cors-middleware'
-import { getSubCategories } from '../../services/products'
+import { getSubCategories } from '../../services/supabase/products'
 
 // {"categories":["REFRIGERATED"]}
 // {categories: string[]}
@@ -17,10 +17,9 @@ export default async function handler(
   const { categories } = req.body
 
   // #TODO: fix front-end to just send one category, not string[]
-  const category = categories.find((c: string) => !!c) || ''
+  const category = categories && categories.length ? categories[0] : ''
 
   const sub_categories = await getSubCategories(category)
 
-  console.log('zomg sub_categories:', sub_categories)
   res.status(200).json(sub_categories)
 }

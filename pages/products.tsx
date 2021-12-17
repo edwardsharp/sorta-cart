@@ -1,6 +1,6 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import Products from '../components/products/Products'
+import ProductsList from '../components/products/ProductsList'
 
 const ProductsPage: NextPage = () => {
   return (
@@ -11,7 +11,7 @@ const ProductsPage: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Products />
+      <ProductsList />
     </>
   )
 }

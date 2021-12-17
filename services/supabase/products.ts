@@ -1,5 +1,4 @@
-import useSWR from 'swr'
-import { definitions } from '../types/supabase'
+import { definitions } from '../../types/supabase'
 import { supabase } from './supabase'
 
 export type Product = definitions['products']
@@ -20,6 +19,8 @@ export async function getCategories(): Promise<{ [index: string]: string }> {
   if (error) {
     throw new Error(error.message)
   }
+
+  // #TODO: rework this to just reduce to a string array of .category items
   return data?.reduce((acc, row) => {
     acc[row.category] = row.category
     return acc
@@ -35,12 +36,8 @@ export async function getSubCategories(category: string) {
   if (error) {
     throw new Error(error.message)
   }
-  console.log(
-    'zomg category:',
-    category,
-    ' distinct_product_sub_categories data:',
-    data
-  )
+
+  // #TODO: rework this to just reduce to a string array of .category items
   return data?.reduce((acc, row) => {
     acc[row.category] = row.category
     return acc
