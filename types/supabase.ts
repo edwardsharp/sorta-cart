@@ -552,6 +552,117 @@ export interface paths {
       };
     };
   };
+  "/stock": {
+    get: {
+      parameters: {
+        query: {
+          variation_id?: parameters["rowFilter.stock.variation_id"];
+          name?: parameters["rowFilter.stock.name"];
+          description?: parameters["rowFilter.stock.description"];
+          price?: parameters["rowFilter.stock.price"];
+          unit?: parameters["rowFilter.stock.unit"];
+          quantity?: parameters["rowFilter.stock.quantity"];
+          sku?: parameters["rowFilter.stock.sku"];
+          item_id?: parameters["rowFilter.stock.item_id"];
+          created_at?: parameters["rowFilter.stock.created_at"];
+          /** Filtering Columns */
+          select?: parameters["select"];
+          /** Ordering */
+          order?: parameters["order"];
+          /** Limiting and Pagination */
+          offset?: parameters["offset"];
+          /** Limiting and Pagination */
+          limit?: parameters["limit"];
+        };
+        header: {
+          /** Limiting and Pagination */
+          Range?: parameters["range"];
+          /** Limiting and Pagination */
+          "Range-Unit"?: parameters["rangeUnit"];
+          /** Preference */
+          Prefer?: parameters["preferCount"];
+        };
+      };
+      responses: {
+        /** OK */
+        200: {
+          schema: definitions["stock"][];
+        };
+        /** Partial Content */
+        206: unknown;
+      };
+    };
+    post: {
+      parameters: {
+        body: {
+          /** stock */
+          stock?: definitions["stock"];
+        };
+        query: {
+          /** Filtering Columns */
+          select?: parameters["select"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** Created */
+        201: unknown;
+      };
+    };
+    delete: {
+      parameters: {
+        query: {
+          variation_id?: parameters["rowFilter.stock.variation_id"];
+          name?: parameters["rowFilter.stock.name"];
+          description?: parameters["rowFilter.stock.description"];
+          price?: parameters["rowFilter.stock.price"];
+          unit?: parameters["rowFilter.stock.unit"];
+          quantity?: parameters["rowFilter.stock.quantity"];
+          sku?: parameters["rowFilter.stock.sku"];
+          item_id?: parameters["rowFilter.stock.item_id"];
+          created_at?: parameters["rowFilter.stock.created_at"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** No Content */
+        204: never;
+      };
+    };
+    patch: {
+      parameters: {
+        query: {
+          variation_id?: parameters["rowFilter.stock.variation_id"];
+          name?: parameters["rowFilter.stock.name"];
+          description?: parameters["rowFilter.stock.description"];
+          price?: parameters["rowFilter.stock.price"];
+          unit?: parameters["rowFilter.stock.unit"];
+          quantity?: parameters["rowFilter.stock.quantity"];
+          sku?: parameters["rowFilter.stock.sku"];
+          item_id?: parameters["rowFilter.stock.item_id"];
+          created_at?: parameters["rowFilter.stock.created_at"];
+        };
+        body: {
+          /** stock */
+          stock?: definitions["stock"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** No Content */
+        204: never;
+      };
+    };
+  };
   "/wholesaleorders": {
     get: {
       parameters: {
@@ -657,6 +768,42 @@ export interface paths {
       responses: {
         /** No Content */
         204: never;
+      };
+    };
+  };
+  "/rpc/distinct_product_sub_categories": {
+    post: {
+      parameters: {
+        body: {
+          args: {
+            category: string;
+          };
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferParams"];
+        };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
+      };
+    };
+  };
+  "/rpc/distinct_product_categories": {
+    post: {
+      parameters: {
+        body: {
+          args: { [key: string]: unknown };
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferParams"];
+        };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
       };
     };
   };
@@ -766,6 +913,22 @@ export interface definitions {
     updatedAt?: string;
     count_on_hand?: number;
     no_backorder?: boolean;
+  };
+  /** square on-hand inventory */
+  stock: {
+    /**
+     * Note:
+     * This is a Primary Key.<pk/>
+     */
+    variation_id: string;
+    name?: string;
+    description?: string;
+    price?: number;
+    unit?: string;
+    quantity?: number;
+    sku?: string;
+    item_id?: string;
+    created_at?: string;
   };
   wholesaleorders: {
     /**
@@ -880,6 +1043,17 @@ export interface parameters {
   "rowFilter.products.updatedAt": string;
   "rowFilter.products.count_on_hand": string;
   "rowFilter.products.no_backorder": string;
+  /** stock */
+  "body.stock": definitions["stock"];
+  "rowFilter.stock.variation_id": string;
+  "rowFilter.stock.name": string;
+  "rowFilter.stock.description": string;
+  "rowFilter.stock.price": string;
+  "rowFilter.stock.unit": string;
+  "rowFilter.stock.quantity": string;
+  "rowFilter.stock.sku": string;
+  "rowFilter.stock.item_id": string;
+  "rowFilter.stock.created_at": string;
   /** wholesaleorders */
   "body.wholesaleorders": definitions["wholesaleorders"];
   "rowFilter.wholesaleorders.id": string;
