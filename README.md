@@ -2,16 +2,25 @@
 
 ## devel
 
-create an `.env.local` (additionally `.env.test` for jest tests) file with the requsite ENV variables:
+create a file named `.env.local` (additionally `.env.test` for jest tests) with the requsite ENV variables:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON=
+SQUARE_ENV=sandbox
+SQUARE_ACCESS_TOKEN=
+SQUARE_SIGNATURE_KEY=
 ```
 
-**note:** `NEXT_PUBLIC_` prefix so is available browser-side.
+**notes:**
 
-run a development server:
+`NEXT_PUBLIC_` prefix so is available browser-side.
+
+`SQUARE_ENV` can be `sandbox` | `production`
+
+`SQUARE_SIGNATURE_KEY` is the key from developer.squareup.com for the registered webhook
+
+#### run a local development server:
 
 ```bash
 npm run dev
