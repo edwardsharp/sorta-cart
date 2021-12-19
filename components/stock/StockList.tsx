@@ -2,20 +2,29 @@ import React from 'react'
 import useSWR from 'swr'
 
 import { getStock, Stock } from '../../services/supabase/stock'
+import styles from '../../styles/Grid.module.css'
+
+function formatPrice(price?: number) {
+  if (price === undefined || price === null) {
+    return ''
+  }
+  const f = (price / 100).toFixed(2)
+  return `$${f}`
+}
 
 export default function StockList() {
   const { data: stock, error } = useSWR('get_stock', () => getStock(1000))
 
   const columns: Array<keyof Stock> = [
-    'variation_id',
+    // 'variation_id',
     'name',
-    'description',
+    // 'description',
     'price',
     'unit',
     'quantity',
-    'sku',
-    'item_id',
-    'created_at',
+    // 'sku',
+    // 'item_id',
+    // 'created_at',
   ]
 
   if (error) return <div>failed to load</div>
@@ -43,35 +52,19 @@ export default function StockList() {
           <button>:)</button>
         </div>
       </div>
-      <table style={{ margin: '0 1em' }}>
-        <thead>
-          <tr
-            style={{
-              position: 'sticky',
-              top: 50,
-              background: 'white',
-              zIndex: 1,
-            }}
-          >
-            {columns.map((col) => (
-              <td key={`${col}`}>{col}</td>
-            ))}
-            <td>&nbsp;</td>
-          </tr>
-        </thead>
-        <tbody>
-          {stock.map((product) => (
-            <tr key={product.variation_id}>
-              {columns.map((col) => (
-                <td key={`${product.variation_id}${col}`}>{product[col]}</td>
-              ))}
-              <td>
-                <button>+</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+
+      <div className={styles.grid}>
+        {stock.map((product) => (
+          <div className={styles.card} key={product.variation_id}>
+            <p>{product.name}</p>
+            <div>
+              <h2>{formatPrice(product.price)}</h2>
+              <span>{product.unit}</span>
+            </div>
+            <small>{product.quantity} available</small>
+          </div>
+        ))}
+      </div>
     </>
   )
 }

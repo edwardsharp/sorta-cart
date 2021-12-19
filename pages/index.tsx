@@ -1,6 +1,8 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import ProductsCard from '../components/products/ProductsCard'
+import StockCard from '../components/stock/StockCard'
+
 import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => {
@@ -18,6 +20,9 @@ const Home: NextPage = () => {
         <div className={styles.grid}>
           <a href="/products" className={styles.card}>
             <ProductsCard />
+          </a>
+          <a href="/stock" className={styles.card}>
+            <StockCard />
           </a>
         </div>
       </main>

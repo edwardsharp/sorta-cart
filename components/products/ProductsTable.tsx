@@ -3,7 +3,7 @@ import useSWR from 'swr'
 
 import { getProducts, Product } from '../../services/supabase/products'
 
-export default function ProductsList() {
+export default function ProductsTable() {
   const { data: products, error } = useSWR('get_products', () =>
     getProducts(1000)
   )

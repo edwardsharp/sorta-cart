@@ -11,8 +11,8 @@ export default function ProductsCard() {
 
   return (
     <>
-      <h2>Products</h2>
-      <p>{products && products.length}</p>
+      <h2>Back Catalog</h2>
+      <p>{products && products.length} products</p>
     </>
   )
 }
