@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import useSWR from 'swr'
 
 import { getProducts, Product } from '../../services/supabase/products'
+import { supabase } from '../../services/supabase/supabase'
 import styles from '../../styles/Grid.module.css'
 
 function formatPrice(product: Product) {
@@ -14,9 +15,13 @@ function formatPrice(product: Product) {
   }
   const ws_price = parseFloat(`${product.ws_price}`).toFixed(2)
   return (
-    <div>
-      <h2>${ws_price}</h2> <i>(${u_price} ea.)</i>
-    </div>
+    <>
+      <h2>${ws_price}</h2>{' '}
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <i>{product.pk} pk</i>
+        <i>${u_price} ea.</i>
+      </div>
+    </>
   )
 }
 
@@ -24,56 +29,19 @@ interface ProductsGrouped {
   [index: string]: { [index: string]: Product[] }
 }
 
-export default function ProductGrid() {
-  const { data: products, error } = useSWR('get_product', async () => {
-    const products = await getProducts(1000)
-    let cats: string[] = []
-    const grouped = products?.reduce((acc, product) => {
-      const cat = product.category || 'no category'
-      if (!acc[cat]) {
-        acc[cat] = {}
-      }
-      if (!cats.includes(cat)) {
-        cats.push(cat)
-      }
-      const sub_cat = product.sub_category || ''
-      if (!acc[cat][sub_cat]) {
-        acc[cat][sub_cat] = []
-      }
-      acc[cat][sub_cat].push(product)
+interface ProductsData {
+  grouped: ProductsGrouped
+  cats: string[]
+  count: number
+}
 
-      return acc
-    }, {} as ProductsGrouped)
-
-    return { grouped, cats, count: products?.length || 0 }
-  })
-
+const Grid = (props: { products: ProductsData; error: any }) => {
+  const { products, error } = props
   if (error) return <div>failed to load</div>
   if (!products) return <div>loading . . .</div>
 
   return (
     <>
-      <div
-        style={{
-          height: 60,
-          position: 'sticky',
-          top: 0,
-          background: 'white',
-          zIndex: 1,
-          margin: '0 1em',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <div>{products.count} products</div>
-        <div>
-          <input type="search" placeholder="Search" />
-
-          <button>:)</button>
-        </div>
-      </div>
-
       {products.cats.map((cat) => (
         <div key={cat}>
           {products.grouped &&
@@ -94,10 +62,7 @@ export default function ProductGrid() {
                     products.grouped[cat][sub_cat].map((product) => (
                       <div className={styles.card} key={product.id}>
                         <p>{product.description}</p>
-                        <div>
-                          {formatPrice(product)}
-                          <span>{product.pk}pk</span>
-                        </div>
+                        <div>{formatPrice(product)}</div>
                         <small>{product.name}</small>
                       </div>
                     ))}
@@ -106,20 +71,75 @@ export default function ProductGrid() {
             ))}
         </div>
       ))}
+    </>
+  )
+}
 
-      <div className={styles.grid}>
-        {/* {products.map((product) => (
-          <div className={styles.card} key={product.id}>
-            <p>{product.description}</p>
-            <p>{product.name}</p>
-            <div>
-              {formatPrice(product)}
-              <span>{product.pk}pk</span>
-            </div>
-            <small></small>
-          </div>
-        ))} */}
+export default function ProductGrid() {
+  const [searchQ, setSearchQ] = useState('')
+  const { data: products, error } = useSWR(
+    { key: 'get_product', searchQ },
+    async ({ searchQ: q }) => {
+      let query = supabase.from('products').select('*', { count: 'exact' })
+      if (q) {
+        query = query.textSearch('fts', q, {
+          type: 'websearch',
+          config: 'english',
+        })
+      }
+      const { data: products, error, count } = await query
+
+      let cats: string[] = []
+      const grouped = products?.reduce((acc, product) => {
+        const cat = product.category || 'no category'
+        if (!acc[cat]) {
+          acc[cat] = {}
+        }
+        if (!cats.includes(cat)) {
+          cats.push(cat)
+        }
+        const sub_cat = product.sub_category || ''
+        if (!acc[cat][sub_cat]) {
+          acc[cat][sub_cat] = []
+        }
+        acc[cat][sub_cat].push(product)
+
+        return acc
+      }, {} as ProductsGrouped)
+
+      return { grouped, cats, count: count || 0 }
+    }
+  )
+
+  return (
+    <>
+      <div
+        style={{
+          height: 60,
+          position: 'sticky',
+          top: 0,
+          background: 'white',
+          zIndex: 1,
+          margin: '0 1em',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <div>{products && products.count} products</div>
+        <div>
+          <input
+            type="search"
+            placeholder="Search"
+            value={searchQ}
+            onChange={(e) => setSearchQ(e.target.value)}
+          />
+
+          {/* <button>:)</button> */}
+        </div>
       </div>
+
+      {products && <Grid products={products} error={error} />}
     </>
   )
 }

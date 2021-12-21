@@ -12,25 +12,28 @@ export interface paths {
       };
     };
   };
-  "/members": {
+  "/Members": {
     get: {
       parameters: {
         query: {
-          id?: parameters["rowFilter.members.id"];
-          UserId?: parameters["rowFilter.members.UserId"];
-          registration_email?: parameters["rowFilter.members.registration_email"];
-          name?: parameters["rowFilter.members.name"];
-          phone?: parameters["rowFilter.members.phone"];
-          address?: parameters["rowFilter.members.address"];
-          discount?: parameters["rowFilter.members.discount"];
-          discount_type?: parameters["rowFilter.members.discount_type"];
-          fees_paid?: parameters["rowFilter.members.fees_paid"];
-          store_credit?: parameters["rowFilter.members.store_credit"];
-          shares?: parameters["rowFilter.members.shares"];
-          member_type?: parameters["rowFilter.members.member_type"];
-          data?: parameters["rowFilter.members.data"];
-          createdAt?: parameters["rowFilter.members.createdAt"];
-          updatedAt?: parameters["rowFilter.members.updatedAt"];
+          id?: parameters["rowFilter.Members.id"];
+          UserId?: parameters["rowFilter.Members.UserId"];
+          registration_email?: parameters["rowFilter.Members.registration_email"];
+          name?: parameters["rowFilter.Members.name"];
+          phone?: parameters["rowFilter.Members.phone"];
+          address?: parameters["rowFilter.Members.address"];
+          discount?: parameters["rowFilter.Members.discount"];
+          discount_type?: parameters["rowFilter.Members.discount_type"];
+          fees_paid?: parameters["rowFilter.Members.fees_paid"];
+          store_credit?: parameters["rowFilter.Members.store_credit"];
+          shares?: parameters["rowFilter.Members.shares"];
+          member_type?: parameters["rowFilter.Members.member_type"];
+          data?: parameters["rowFilter.Members.data"];
+          createdAt?: parameters["rowFilter.Members.createdAt"];
+          updatedAt?: parameters["rowFilter.Members.updatedAt"];
+          /** admin user */
+          is_admin?: parameters["rowFilter.Members.is_admin"];
+          fts?: parameters["rowFilter.Members.fts"];
           /** Filtering Columns */
           select?: parameters["select"];
           /** Ordering */
@@ -52,7 +55,7 @@ export interface paths {
       responses: {
         /** OK */
         200: {
-          schema: definitions["members"][];
+          schema: definitions["Members"][];
         };
         /** Partial Content */
         206: unknown;
@@ -61,8 +64,8 @@ export interface paths {
     post: {
       parameters: {
         body: {
-          /** members */
-          members?: definitions["members"];
+          /** Members */
+          Members?: definitions["Members"];
         };
         query: {
           /** Filtering Columns */
@@ -81,21 +84,24 @@ export interface paths {
     delete: {
       parameters: {
         query: {
-          id?: parameters["rowFilter.members.id"];
-          UserId?: parameters["rowFilter.members.UserId"];
-          registration_email?: parameters["rowFilter.members.registration_email"];
-          name?: parameters["rowFilter.members.name"];
-          phone?: parameters["rowFilter.members.phone"];
-          address?: parameters["rowFilter.members.address"];
-          discount?: parameters["rowFilter.members.discount"];
-          discount_type?: parameters["rowFilter.members.discount_type"];
-          fees_paid?: parameters["rowFilter.members.fees_paid"];
-          store_credit?: parameters["rowFilter.members.store_credit"];
-          shares?: parameters["rowFilter.members.shares"];
-          member_type?: parameters["rowFilter.members.member_type"];
-          data?: parameters["rowFilter.members.data"];
-          createdAt?: parameters["rowFilter.members.createdAt"];
-          updatedAt?: parameters["rowFilter.members.updatedAt"];
+          id?: parameters["rowFilter.Members.id"];
+          UserId?: parameters["rowFilter.Members.UserId"];
+          registration_email?: parameters["rowFilter.Members.registration_email"];
+          name?: parameters["rowFilter.Members.name"];
+          phone?: parameters["rowFilter.Members.phone"];
+          address?: parameters["rowFilter.Members.address"];
+          discount?: parameters["rowFilter.Members.discount"];
+          discount_type?: parameters["rowFilter.Members.discount_type"];
+          fees_paid?: parameters["rowFilter.Members.fees_paid"];
+          store_credit?: parameters["rowFilter.Members.store_credit"];
+          shares?: parameters["rowFilter.Members.shares"];
+          member_type?: parameters["rowFilter.Members.member_type"];
+          data?: parameters["rowFilter.Members.data"];
+          createdAt?: parameters["rowFilter.Members.createdAt"];
+          updatedAt?: parameters["rowFilter.Members.updatedAt"];
+          /** admin user */
+          is_admin?: parameters["rowFilter.Members.is_admin"];
+          fts?: parameters["rowFilter.Members.fts"];
         };
         header: {
           /** Preference */
@@ -110,25 +116,28 @@ export interface paths {
     patch: {
       parameters: {
         query: {
-          id?: parameters["rowFilter.members.id"];
-          UserId?: parameters["rowFilter.members.UserId"];
-          registration_email?: parameters["rowFilter.members.registration_email"];
-          name?: parameters["rowFilter.members.name"];
-          phone?: parameters["rowFilter.members.phone"];
-          address?: parameters["rowFilter.members.address"];
-          discount?: parameters["rowFilter.members.discount"];
-          discount_type?: parameters["rowFilter.members.discount_type"];
-          fees_paid?: parameters["rowFilter.members.fees_paid"];
-          store_credit?: parameters["rowFilter.members.store_credit"];
-          shares?: parameters["rowFilter.members.shares"];
-          member_type?: parameters["rowFilter.members.member_type"];
-          data?: parameters["rowFilter.members.data"];
-          createdAt?: parameters["rowFilter.members.createdAt"];
-          updatedAt?: parameters["rowFilter.members.updatedAt"];
+          id?: parameters["rowFilter.Members.id"];
+          UserId?: parameters["rowFilter.Members.UserId"];
+          registration_email?: parameters["rowFilter.Members.registration_email"];
+          name?: parameters["rowFilter.Members.name"];
+          phone?: parameters["rowFilter.Members.phone"];
+          address?: parameters["rowFilter.Members.address"];
+          discount?: parameters["rowFilter.Members.discount"];
+          discount_type?: parameters["rowFilter.Members.discount_type"];
+          fees_paid?: parameters["rowFilter.Members.fees_paid"];
+          store_credit?: parameters["rowFilter.Members.store_credit"];
+          shares?: parameters["rowFilter.Members.shares"];
+          member_type?: parameters["rowFilter.Members.member_type"];
+          data?: parameters["rowFilter.Members.data"];
+          createdAt?: parameters["rowFilter.Members.createdAt"];
+          updatedAt?: parameters["rowFilter.Members.updatedAt"];
+          /** admin user */
+          is_admin?: parameters["rowFilter.Members.is_admin"];
+          fts?: parameters["rowFilter.Members.fts"];
         };
         body: {
-          /** members */
-          members?: definitions["members"];
+          /** Members */
+          Members?: definitions["Members"];
         };
         header: {
           /** Preference */
@@ -141,24 +150,24 @@ export interface paths {
       };
     };
   };
-  "/orderlineitems": {
+  "/OrderLineItems": {
     get: {
       parameters: {
         query: {
-          id?: parameters["rowFilter.orderlineitems.id"];
-          OrderId?: parameters["rowFilter.orderlineitems.OrderId"];
-          WholesaleOrderId?: parameters["rowFilter.orderlineitems.WholesaleOrderId"];
-          price?: parameters["rowFilter.orderlineitems.price"];
-          quantity?: parameters["rowFilter.orderlineitems.quantity"];
-          total?: parameters["rowFilter.orderlineitems.total"];
-          kind?: parameters["rowFilter.orderlineitems.kind"];
-          description?: parameters["rowFilter.orderlineitems.description"];
-          vendor?: parameters["rowFilter.orderlineitems.vendor"];
-          selected_unit?: parameters["rowFilter.orderlineitems.selected_unit"];
-          data?: parameters["rowFilter.orderlineitems.data"];
-          createdAt?: parameters["rowFilter.orderlineitems.createdAt"];
-          updatedAt?: parameters["rowFilter.orderlineitems.updatedAt"];
-          status?: parameters["rowFilter.orderlineitems.status"];
+          id?: parameters["rowFilter.OrderLineItems.id"];
+          OrderId?: parameters["rowFilter.OrderLineItems.OrderId"];
+          WholesaleOrderId?: parameters["rowFilter.OrderLineItems.WholesaleOrderId"];
+          price?: parameters["rowFilter.OrderLineItems.price"];
+          quantity?: parameters["rowFilter.OrderLineItems.quantity"];
+          total?: parameters["rowFilter.OrderLineItems.total"];
+          kind?: parameters["rowFilter.OrderLineItems.kind"];
+          description?: parameters["rowFilter.OrderLineItems.description"];
+          vendor?: parameters["rowFilter.OrderLineItems.vendor"];
+          selected_unit?: parameters["rowFilter.OrderLineItems.selected_unit"];
+          data?: parameters["rowFilter.OrderLineItems.data"];
+          createdAt?: parameters["rowFilter.OrderLineItems.createdAt"];
+          updatedAt?: parameters["rowFilter.OrderLineItems.updatedAt"];
+          status?: parameters["rowFilter.OrderLineItems.status"];
           /** Filtering Columns */
           select?: parameters["select"];
           /** Ordering */
@@ -180,7 +189,7 @@ export interface paths {
       responses: {
         /** OK */
         200: {
-          schema: definitions["orderlineitems"][];
+          schema: definitions["OrderLineItems"][];
         };
         /** Partial Content */
         206: unknown;
@@ -189,8 +198,8 @@ export interface paths {
     post: {
       parameters: {
         body: {
-          /** orderlineitems */
-          orderlineitems?: definitions["orderlineitems"];
+          /** OrderLineItems */
+          OrderLineItems?: definitions["OrderLineItems"];
         };
         query: {
           /** Filtering Columns */
@@ -209,20 +218,20 @@ export interface paths {
     delete: {
       parameters: {
         query: {
-          id?: parameters["rowFilter.orderlineitems.id"];
-          OrderId?: parameters["rowFilter.orderlineitems.OrderId"];
-          WholesaleOrderId?: parameters["rowFilter.orderlineitems.WholesaleOrderId"];
-          price?: parameters["rowFilter.orderlineitems.price"];
-          quantity?: parameters["rowFilter.orderlineitems.quantity"];
-          total?: parameters["rowFilter.orderlineitems.total"];
-          kind?: parameters["rowFilter.orderlineitems.kind"];
-          description?: parameters["rowFilter.orderlineitems.description"];
-          vendor?: parameters["rowFilter.orderlineitems.vendor"];
-          selected_unit?: parameters["rowFilter.orderlineitems.selected_unit"];
-          data?: parameters["rowFilter.orderlineitems.data"];
-          createdAt?: parameters["rowFilter.orderlineitems.createdAt"];
-          updatedAt?: parameters["rowFilter.orderlineitems.updatedAt"];
-          status?: parameters["rowFilter.orderlineitems.status"];
+          id?: parameters["rowFilter.OrderLineItems.id"];
+          OrderId?: parameters["rowFilter.OrderLineItems.OrderId"];
+          WholesaleOrderId?: parameters["rowFilter.OrderLineItems.WholesaleOrderId"];
+          price?: parameters["rowFilter.OrderLineItems.price"];
+          quantity?: parameters["rowFilter.OrderLineItems.quantity"];
+          total?: parameters["rowFilter.OrderLineItems.total"];
+          kind?: parameters["rowFilter.OrderLineItems.kind"];
+          description?: parameters["rowFilter.OrderLineItems.description"];
+          vendor?: parameters["rowFilter.OrderLineItems.vendor"];
+          selected_unit?: parameters["rowFilter.OrderLineItems.selected_unit"];
+          data?: parameters["rowFilter.OrderLineItems.data"];
+          createdAt?: parameters["rowFilter.OrderLineItems.createdAt"];
+          updatedAt?: parameters["rowFilter.OrderLineItems.updatedAt"];
+          status?: parameters["rowFilter.OrderLineItems.status"];
         };
         header: {
           /** Preference */
@@ -237,24 +246,24 @@ export interface paths {
     patch: {
       parameters: {
         query: {
-          id?: parameters["rowFilter.orderlineitems.id"];
-          OrderId?: parameters["rowFilter.orderlineitems.OrderId"];
-          WholesaleOrderId?: parameters["rowFilter.orderlineitems.WholesaleOrderId"];
-          price?: parameters["rowFilter.orderlineitems.price"];
-          quantity?: parameters["rowFilter.orderlineitems.quantity"];
-          total?: parameters["rowFilter.orderlineitems.total"];
-          kind?: parameters["rowFilter.orderlineitems.kind"];
-          description?: parameters["rowFilter.orderlineitems.description"];
-          vendor?: parameters["rowFilter.orderlineitems.vendor"];
-          selected_unit?: parameters["rowFilter.orderlineitems.selected_unit"];
-          data?: parameters["rowFilter.orderlineitems.data"];
-          createdAt?: parameters["rowFilter.orderlineitems.createdAt"];
-          updatedAt?: parameters["rowFilter.orderlineitems.updatedAt"];
-          status?: parameters["rowFilter.orderlineitems.status"];
+          id?: parameters["rowFilter.OrderLineItems.id"];
+          OrderId?: parameters["rowFilter.OrderLineItems.OrderId"];
+          WholesaleOrderId?: parameters["rowFilter.OrderLineItems.WholesaleOrderId"];
+          price?: parameters["rowFilter.OrderLineItems.price"];
+          quantity?: parameters["rowFilter.OrderLineItems.quantity"];
+          total?: parameters["rowFilter.OrderLineItems.total"];
+          kind?: parameters["rowFilter.OrderLineItems.kind"];
+          description?: parameters["rowFilter.OrderLineItems.description"];
+          vendor?: parameters["rowFilter.OrderLineItems.vendor"];
+          selected_unit?: parameters["rowFilter.OrderLineItems.selected_unit"];
+          data?: parameters["rowFilter.OrderLineItems.data"];
+          createdAt?: parameters["rowFilter.OrderLineItems.createdAt"];
+          updatedAt?: parameters["rowFilter.OrderLineItems.updatedAt"];
+          status?: parameters["rowFilter.OrderLineItems.status"];
         };
         body: {
-          /** orderlineitems */
-          orderlineitems?: definitions["orderlineitems"];
+          /** OrderLineItems */
+          OrderLineItems?: definitions["OrderLineItems"];
         };
         header: {
           /** Preference */
@@ -267,28 +276,29 @@ export interface paths {
       };
     };
   };
-  "/orders": {
+  "/Orders": {
     get: {
       parameters: {
         query: {
-          id?: parameters["rowFilter.orders.id"];
-          UserId?: parameters["rowFilter.orders.UserId"];
-          status?: parameters["rowFilter.orders.status"];
-          payment_status?: parameters["rowFilter.orders.payment_status"];
-          shipment_status?: parameters["rowFilter.orders.shipment_status"];
-          total?: parameters["rowFilter.orders.total"];
-          subtotal?: parameters["rowFilter.orders.subtotal"];
-          name?: parameters["rowFilter.orders.name"];
-          email?: parameters["rowFilter.orders.email"];
-          phone?: parameters["rowFilter.orders.phone"];
-          address?: parameters["rowFilter.orders.address"];
-          notes?: parameters["rowFilter.orders.notes"];
-          email_sent?: parameters["rowFilter.orders.email_sent"];
-          item_count?: parameters["rowFilter.orders.item_count"];
-          history?: parameters["rowFilter.orders.history"];
-          createdAt?: parameters["rowFilter.orders.createdAt"];
-          updatedAt?: parameters["rowFilter.orders.updatedAt"];
-          MemberId?: parameters["rowFilter.orders.MemberId"];
+          id?: parameters["rowFilter.Orders.id"];
+          UserId?: parameters["rowFilter.Orders.UserId"];
+          status?: parameters["rowFilter.Orders.status"];
+          payment_status?: parameters["rowFilter.Orders.payment_status"];
+          shipment_status?: parameters["rowFilter.Orders.shipment_status"];
+          total?: parameters["rowFilter.Orders.total"];
+          subtotal?: parameters["rowFilter.Orders.subtotal"];
+          name?: parameters["rowFilter.Orders.name"];
+          email?: parameters["rowFilter.Orders.email"];
+          phone?: parameters["rowFilter.Orders.phone"];
+          address?: parameters["rowFilter.Orders.address"];
+          notes?: parameters["rowFilter.Orders.notes"];
+          email_sent?: parameters["rowFilter.Orders.email_sent"];
+          item_count?: parameters["rowFilter.Orders.item_count"];
+          history?: parameters["rowFilter.Orders.history"];
+          createdAt?: parameters["rowFilter.Orders.createdAt"];
+          updatedAt?: parameters["rowFilter.Orders.updatedAt"];
+          MemberId?: parameters["rowFilter.Orders.MemberId"];
+          fts?: parameters["rowFilter.Orders.fts"];
           /** Filtering Columns */
           select?: parameters["select"];
           /** Ordering */
@@ -310,7 +320,7 @@ export interface paths {
       responses: {
         /** OK */
         200: {
-          schema: definitions["orders"][];
+          schema: definitions["Orders"][];
         };
         /** Partial Content */
         206: unknown;
@@ -319,8 +329,8 @@ export interface paths {
     post: {
       parameters: {
         body: {
-          /** orders */
-          orders?: definitions["orders"];
+          /** Orders */
+          Orders?: definitions["Orders"];
         };
         query: {
           /** Filtering Columns */
@@ -339,24 +349,25 @@ export interface paths {
     delete: {
       parameters: {
         query: {
-          id?: parameters["rowFilter.orders.id"];
-          UserId?: parameters["rowFilter.orders.UserId"];
-          status?: parameters["rowFilter.orders.status"];
-          payment_status?: parameters["rowFilter.orders.payment_status"];
-          shipment_status?: parameters["rowFilter.orders.shipment_status"];
-          total?: parameters["rowFilter.orders.total"];
-          subtotal?: parameters["rowFilter.orders.subtotal"];
-          name?: parameters["rowFilter.orders.name"];
-          email?: parameters["rowFilter.orders.email"];
-          phone?: parameters["rowFilter.orders.phone"];
-          address?: parameters["rowFilter.orders.address"];
-          notes?: parameters["rowFilter.orders.notes"];
-          email_sent?: parameters["rowFilter.orders.email_sent"];
-          item_count?: parameters["rowFilter.orders.item_count"];
-          history?: parameters["rowFilter.orders.history"];
-          createdAt?: parameters["rowFilter.orders.createdAt"];
-          updatedAt?: parameters["rowFilter.orders.updatedAt"];
-          MemberId?: parameters["rowFilter.orders.MemberId"];
+          id?: parameters["rowFilter.Orders.id"];
+          UserId?: parameters["rowFilter.Orders.UserId"];
+          status?: parameters["rowFilter.Orders.status"];
+          payment_status?: parameters["rowFilter.Orders.payment_status"];
+          shipment_status?: parameters["rowFilter.Orders.shipment_status"];
+          total?: parameters["rowFilter.Orders.total"];
+          subtotal?: parameters["rowFilter.Orders.subtotal"];
+          name?: parameters["rowFilter.Orders.name"];
+          email?: parameters["rowFilter.Orders.email"];
+          phone?: parameters["rowFilter.Orders.phone"];
+          address?: parameters["rowFilter.Orders.address"];
+          notes?: parameters["rowFilter.Orders.notes"];
+          email_sent?: parameters["rowFilter.Orders.email_sent"];
+          item_count?: parameters["rowFilter.Orders.item_count"];
+          history?: parameters["rowFilter.Orders.history"];
+          createdAt?: parameters["rowFilter.Orders.createdAt"];
+          updatedAt?: parameters["rowFilter.Orders.updatedAt"];
+          MemberId?: parameters["rowFilter.Orders.MemberId"];
+          fts?: parameters["rowFilter.Orders.fts"];
         };
         header: {
           /** Preference */
@@ -371,28 +382,137 @@ export interface paths {
     patch: {
       parameters: {
         query: {
-          id?: parameters["rowFilter.orders.id"];
-          UserId?: parameters["rowFilter.orders.UserId"];
-          status?: parameters["rowFilter.orders.status"];
-          payment_status?: parameters["rowFilter.orders.payment_status"];
-          shipment_status?: parameters["rowFilter.orders.shipment_status"];
-          total?: parameters["rowFilter.orders.total"];
-          subtotal?: parameters["rowFilter.orders.subtotal"];
-          name?: parameters["rowFilter.orders.name"];
-          email?: parameters["rowFilter.orders.email"];
-          phone?: parameters["rowFilter.orders.phone"];
-          address?: parameters["rowFilter.orders.address"];
-          notes?: parameters["rowFilter.orders.notes"];
-          email_sent?: parameters["rowFilter.orders.email_sent"];
-          item_count?: parameters["rowFilter.orders.item_count"];
-          history?: parameters["rowFilter.orders.history"];
-          createdAt?: parameters["rowFilter.orders.createdAt"];
-          updatedAt?: parameters["rowFilter.orders.updatedAt"];
-          MemberId?: parameters["rowFilter.orders.MemberId"];
+          id?: parameters["rowFilter.Orders.id"];
+          UserId?: parameters["rowFilter.Orders.UserId"];
+          status?: parameters["rowFilter.Orders.status"];
+          payment_status?: parameters["rowFilter.Orders.payment_status"];
+          shipment_status?: parameters["rowFilter.Orders.shipment_status"];
+          total?: parameters["rowFilter.Orders.total"];
+          subtotal?: parameters["rowFilter.Orders.subtotal"];
+          name?: parameters["rowFilter.Orders.name"];
+          email?: parameters["rowFilter.Orders.email"];
+          phone?: parameters["rowFilter.Orders.phone"];
+          address?: parameters["rowFilter.Orders.address"];
+          notes?: parameters["rowFilter.Orders.notes"];
+          email_sent?: parameters["rowFilter.Orders.email_sent"];
+          item_count?: parameters["rowFilter.Orders.item_count"];
+          history?: parameters["rowFilter.Orders.history"];
+          createdAt?: parameters["rowFilter.Orders.createdAt"];
+          updatedAt?: parameters["rowFilter.Orders.updatedAt"];
+          MemberId?: parameters["rowFilter.Orders.MemberId"];
+          fts?: parameters["rowFilter.Orders.fts"];
         };
         body: {
-          /** orders */
-          orders?: definitions["orders"];
+          /** Orders */
+          Orders?: definitions["Orders"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** No Content */
+        204: never;
+      };
+    };
+  };
+  "/WholesaleOrders": {
+    get: {
+      parameters: {
+        query: {
+          id?: parameters["rowFilter.WholesaleOrders.id"];
+          vendor?: parameters["rowFilter.WholesaleOrders.vendor"];
+          notes?: parameters["rowFilter.WholesaleOrders.notes"];
+          status?: parameters["rowFilter.WholesaleOrders.status"];
+          payment_status?: parameters["rowFilter.WholesaleOrders.payment_status"];
+          shipment_status?: parameters["rowFilter.WholesaleOrders.shipment_status"];
+          createdAt?: parameters["rowFilter.WholesaleOrders.createdAt"];
+          updatedAt?: parameters["rowFilter.WholesaleOrders.updatedAt"];
+          /** Filtering Columns */
+          select?: parameters["select"];
+          /** Ordering */
+          order?: parameters["order"];
+          /** Limiting and Pagination */
+          offset?: parameters["offset"];
+          /** Limiting and Pagination */
+          limit?: parameters["limit"];
+        };
+        header: {
+          /** Limiting and Pagination */
+          Range?: parameters["range"];
+          /** Limiting and Pagination */
+          "Range-Unit"?: parameters["rangeUnit"];
+          /** Preference */
+          Prefer?: parameters["preferCount"];
+        };
+      };
+      responses: {
+        /** OK */
+        200: {
+          schema: definitions["WholesaleOrders"][];
+        };
+        /** Partial Content */
+        206: unknown;
+      };
+    };
+    post: {
+      parameters: {
+        body: {
+          /** WholesaleOrders */
+          WholesaleOrders?: definitions["WholesaleOrders"];
+        };
+        query: {
+          /** Filtering Columns */
+          select?: parameters["select"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** Created */
+        201: unknown;
+      };
+    };
+    delete: {
+      parameters: {
+        query: {
+          id?: parameters["rowFilter.WholesaleOrders.id"];
+          vendor?: parameters["rowFilter.WholesaleOrders.vendor"];
+          notes?: parameters["rowFilter.WholesaleOrders.notes"];
+          status?: parameters["rowFilter.WholesaleOrders.status"];
+          payment_status?: parameters["rowFilter.WholesaleOrders.payment_status"];
+          shipment_status?: parameters["rowFilter.WholesaleOrders.shipment_status"];
+          createdAt?: parameters["rowFilter.WholesaleOrders.createdAt"];
+          updatedAt?: parameters["rowFilter.WholesaleOrders.updatedAt"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** No Content */
+        204: never;
+      };
+    };
+    patch: {
+      parameters: {
+        query: {
+          id?: parameters["rowFilter.WholesaleOrders.id"];
+          vendor?: parameters["rowFilter.WholesaleOrders.vendor"];
+          notes?: parameters["rowFilter.WholesaleOrders.notes"];
+          status?: parameters["rowFilter.WholesaleOrders.status"];
+          payment_status?: parameters["rowFilter.WholesaleOrders.payment_status"];
+          shipment_status?: parameters["rowFilter.WholesaleOrders.shipment_status"];
+          createdAt?: parameters["rowFilter.WholesaleOrders.createdAt"];
+          updatedAt?: parameters["rowFilter.WholesaleOrders.updatedAt"];
+        };
+        body: {
+          /** WholesaleOrders */
+          WholesaleOrders?: definitions["WholesaleOrders"];
         };
         header: {
           /** Preference */
@@ -430,6 +550,7 @@ export interface paths {
           updatedAt?: parameters["rowFilter.products.updatedAt"];
           count_on_hand?: parameters["rowFilter.products.count_on_hand"];
           no_backorder?: parameters["rowFilter.products.no_backorder"];
+          fts?: parameters["rowFilter.products.fts"];
           /** Filtering Columns */
           select?: parameters["select"];
           /** Ordering */
@@ -501,6 +622,7 @@ export interface paths {
           updatedAt?: parameters["rowFilter.products.updatedAt"];
           count_on_hand?: parameters["rowFilter.products.count_on_hand"];
           no_backorder?: parameters["rowFilter.products.no_backorder"];
+          fts?: parameters["rowFilter.products.fts"];
         };
         header: {
           /** Preference */
@@ -536,6 +658,7 @@ export interface paths {
           updatedAt?: parameters["rowFilter.products.updatedAt"];
           count_on_hand?: parameters["rowFilter.products.count_on_hand"];
           no_backorder?: parameters["rowFilter.products.no_backorder"];
+          fts?: parameters["rowFilter.products.fts"];
         };
         body: {
           /** products */
@@ -663,114 +786,6 @@ export interface paths {
       };
     };
   };
-  "/wholesaleorders": {
-    get: {
-      parameters: {
-        query: {
-          id?: parameters["rowFilter.wholesaleorders.id"];
-          vendor?: parameters["rowFilter.wholesaleorders.vendor"];
-          notes?: parameters["rowFilter.wholesaleorders.notes"];
-          status?: parameters["rowFilter.wholesaleorders.status"];
-          payment_status?: parameters["rowFilter.wholesaleorders.payment_status"];
-          shipment_status?: parameters["rowFilter.wholesaleorders.shipment_status"];
-          createdAt?: parameters["rowFilter.wholesaleorders.createdAt"];
-          updatedAt?: parameters["rowFilter.wholesaleorders.updatedAt"];
-          /** Filtering Columns */
-          select?: parameters["select"];
-          /** Ordering */
-          order?: parameters["order"];
-          /** Limiting and Pagination */
-          offset?: parameters["offset"];
-          /** Limiting and Pagination */
-          limit?: parameters["limit"];
-        };
-        header: {
-          /** Limiting and Pagination */
-          Range?: parameters["range"];
-          /** Limiting and Pagination */
-          "Range-Unit"?: parameters["rangeUnit"];
-          /** Preference */
-          Prefer?: parameters["preferCount"];
-        };
-      };
-      responses: {
-        /** OK */
-        200: {
-          schema: definitions["wholesaleorders"][];
-        };
-        /** Partial Content */
-        206: unknown;
-      };
-    };
-    post: {
-      parameters: {
-        body: {
-          /** wholesaleorders */
-          wholesaleorders?: definitions["wholesaleorders"];
-        };
-        query: {
-          /** Filtering Columns */
-          select?: parameters["select"];
-        };
-        header: {
-          /** Preference */
-          Prefer?: parameters["preferReturn"];
-        };
-      };
-      responses: {
-        /** Created */
-        201: unknown;
-      };
-    };
-    delete: {
-      parameters: {
-        query: {
-          id?: parameters["rowFilter.wholesaleorders.id"];
-          vendor?: parameters["rowFilter.wholesaleorders.vendor"];
-          notes?: parameters["rowFilter.wholesaleorders.notes"];
-          status?: parameters["rowFilter.wholesaleorders.status"];
-          payment_status?: parameters["rowFilter.wholesaleorders.payment_status"];
-          shipment_status?: parameters["rowFilter.wholesaleorders.shipment_status"];
-          createdAt?: parameters["rowFilter.wholesaleorders.createdAt"];
-          updatedAt?: parameters["rowFilter.wholesaleorders.updatedAt"];
-        };
-        header: {
-          /** Preference */
-          Prefer?: parameters["preferReturn"];
-        };
-      };
-      responses: {
-        /** No Content */
-        204: never;
-      };
-    };
-    patch: {
-      parameters: {
-        query: {
-          id?: parameters["rowFilter.wholesaleorders.id"];
-          vendor?: parameters["rowFilter.wholesaleorders.vendor"];
-          notes?: parameters["rowFilter.wholesaleorders.notes"];
-          status?: parameters["rowFilter.wholesaleorders.status"];
-          payment_status?: parameters["rowFilter.wholesaleorders.payment_status"];
-          shipment_status?: parameters["rowFilter.wholesaleorders.shipment_status"];
-          createdAt?: parameters["rowFilter.wholesaleorders.createdAt"];
-          updatedAt?: parameters["rowFilter.wholesaleorders.updatedAt"];
-        };
-        body: {
-          /** wholesaleorders */
-          wholesaleorders?: definitions["wholesaleorders"];
-        };
-        header: {
-          /** Preference */
-          Prefer?: parameters["preferReturn"];
-        };
-      };
-      responses: {
-        /** No Content */
-        204: never;
-      };
-    };
-  };
   "/rpc/distinct_product_sub_categories": {
     post: {
       parameters: {
@@ -810,7 +825,7 @@ export interface paths {
 }
 
 export interface definitions {
-  members: {
+  Members: {
     /**
      * Note:
      * This is a Primary Key.<pk/>
@@ -830,8 +845,11 @@ export interface definitions {
     data?: string;
     createdAt?: string;
     updatedAt?: string;
+    /** admin user */
+    is_admin: boolean;
+    fts?: string;
   };
-  orderlineitems: {
+  OrderLineItems: {
     /**
      * Note:
      * This is a Primary Key.<pk/>
@@ -839,12 +857,12 @@ export interface definitions {
     id: number;
     /**
      * Note:
-     * This is a Foreign Key to `orders.id`.<fk table='orders' column='id'/>
+     * This is a Foreign Key to `Orders.id`.<fk table='Orders' column='id'/>
      */
     OrderId?: number;
     /**
      * Note:
-     * This is a Foreign Key to `wholesaleorders.id`.<fk table='wholesaleorders' column='id'/>
+     * This is a Foreign Key to `WholesaleOrders.id`.<fk table='WholesaleOrders' column='id'/>
      */
     WholesaleOrderId?: number;
     price?: number;
@@ -859,7 +877,7 @@ export interface definitions {
     updatedAt?: string;
     status?: string;
   };
-  orders: {
+  Orders: {
     /**
      * Note:
      * This is a Primary Key.<pk/>
@@ -883,9 +901,24 @@ export interface definitions {
     updatedAt?: string;
     /**
      * Note:
-     * This is a Foreign Key to `members.id`.<fk table='members' column='id'/>
+     * This is a Foreign Key to `Members.id`.<fk table='Members' column='id'/>
      */
     MemberId?: number;
+    fts?: string;
+  };
+  WholesaleOrders: {
+    /**
+     * Note:
+     * This is a Primary Key.<pk/>
+     */
+    id: number;
+    vendor?: string;
+    notes?: string;
+    status?: string;
+    payment_status?: string;
+    shipment_status?: string;
+    createdAt?: string;
+    updatedAt?: string;
   };
   products: {
     /**
@@ -913,6 +946,7 @@ export interface definitions {
     updatedAt?: string;
     count_on_hand?: number;
     no_backorder?: boolean;
+    fts?: string;
   };
   /** square on-hand inventory */
   stock: {
@@ -929,20 +963,6 @@ export interface definitions {
     sku?: string;
     item_id?: string;
     created_at?: string;
-  };
-  wholesaleorders: {
-    /**
-     * Note:
-     * This is a Primary Key.<pk/>
-     */
-    id: number;
-    vendor?: string;
-    notes?: string;
-    status?: string;
-    payment_status?: string;
-    shipment_status?: string;
-    createdAt?: string;
-    updatedAt?: string;
   };
 }
 
@@ -967,59 +987,73 @@ export interface parameters {
   offset: string;
   /** Limiting and Pagination */
   limit: string;
-  /** members */
-  "body.members": definitions["members"];
-  "rowFilter.members.id": string;
-  "rowFilter.members.UserId": string;
-  "rowFilter.members.registration_email": string;
-  "rowFilter.members.name": string;
-  "rowFilter.members.phone": string;
-  "rowFilter.members.address": string;
-  "rowFilter.members.discount": string;
-  "rowFilter.members.discount_type": string;
-  "rowFilter.members.fees_paid": string;
-  "rowFilter.members.store_credit": string;
-  "rowFilter.members.shares": string;
-  "rowFilter.members.member_type": string;
-  "rowFilter.members.data": string;
-  "rowFilter.members.createdAt": string;
-  "rowFilter.members.updatedAt": string;
-  /** orderlineitems */
-  "body.orderlineitems": definitions["orderlineitems"];
-  "rowFilter.orderlineitems.id": string;
-  "rowFilter.orderlineitems.OrderId": string;
-  "rowFilter.orderlineitems.WholesaleOrderId": string;
-  "rowFilter.orderlineitems.price": string;
-  "rowFilter.orderlineitems.quantity": string;
-  "rowFilter.orderlineitems.total": string;
-  "rowFilter.orderlineitems.kind": string;
-  "rowFilter.orderlineitems.description": string;
-  "rowFilter.orderlineitems.vendor": string;
-  "rowFilter.orderlineitems.selected_unit": string;
-  "rowFilter.orderlineitems.data": string;
-  "rowFilter.orderlineitems.createdAt": string;
-  "rowFilter.orderlineitems.updatedAt": string;
-  "rowFilter.orderlineitems.status": string;
-  /** orders */
-  "body.orders": definitions["orders"];
-  "rowFilter.orders.id": string;
-  "rowFilter.orders.UserId": string;
-  "rowFilter.orders.status": string;
-  "rowFilter.orders.payment_status": string;
-  "rowFilter.orders.shipment_status": string;
-  "rowFilter.orders.total": string;
-  "rowFilter.orders.subtotal": string;
-  "rowFilter.orders.name": string;
-  "rowFilter.orders.email": string;
-  "rowFilter.orders.phone": string;
-  "rowFilter.orders.address": string;
-  "rowFilter.orders.notes": string;
-  "rowFilter.orders.email_sent": string;
-  "rowFilter.orders.item_count": string;
-  "rowFilter.orders.history": string;
-  "rowFilter.orders.createdAt": string;
-  "rowFilter.orders.updatedAt": string;
-  "rowFilter.orders.MemberId": string;
+  /** Members */
+  "body.Members": definitions["Members"];
+  "rowFilter.Members.id": string;
+  "rowFilter.Members.UserId": string;
+  "rowFilter.Members.registration_email": string;
+  "rowFilter.Members.name": string;
+  "rowFilter.Members.phone": string;
+  "rowFilter.Members.address": string;
+  "rowFilter.Members.discount": string;
+  "rowFilter.Members.discount_type": string;
+  "rowFilter.Members.fees_paid": string;
+  "rowFilter.Members.store_credit": string;
+  "rowFilter.Members.shares": string;
+  "rowFilter.Members.member_type": string;
+  "rowFilter.Members.data": string;
+  "rowFilter.Members.createdAt": string;
+  "rowFilter.Members.updatedAt": string;
+  /** admin user */
+  "rowFilter.Members.is_admin": string;
+  "rowFilter.Members.fts": string;
+  /** OrderLineItems */
+  "body.OrderLineItems": definitions["OrderLineItems"];
+  "rowFilter.OrderLineItems.id": string;
+  "rowFilter.OrderLineItems.OrderId": string;
+  "rowFilter.OrderLineItems.WholesaleOrderId": string;
+  "rowFilter.OrderLineItems.price": string;
+  "rowFilter.OrderLineItems.quantity": string;
+  "rowFilter.OrderLineItems.total": string;
+  "rowFilter.OrderLineItems.kind": string;
+  "rowFilter.OrderLineItems.description": string;
+  "rowFilter.OrderLineItems.vendor": string;
+  "rowFilter.OrderLineItems.selected_unit": string;
+  "rowFilter.OrderLineItems.data": string;
+  "rowFilter.OrderLineItems.createdAt": string;
+  "rowFilter.OrderLineItems.updatedAt": string;
+  "rowFilter.OrderLineItems.status": string;
+  /** Orders */
+  "body.Orders": definitions["Orders"];
+  "rowFilter.Orders.id": string;
+  "rowFilter.Orders.UserId": string;
+  "rowFilter.Orders.status": string;
+  "rowFilter.Orders.payment_status": string;
+  "rowFilter.Orders.shipment_status": string;
+  "rowFilter.Orders.total": string;
+  "rowFilter.Orders.subtotal": string;
+  "rowFilter.Orders.name": string;
+  "rowFilter.Orders.email": string;
+  "rowFilter.Orders.phone": string;
+  "rowFilter.Orders.address": string;
+  "rowFilter.Orders.notes": string;
+  "rowFilter.Orders.email_sent": string;
+  "rowFilter.Orders.item_count": string;
+  "rowFilter.Orders.history": string;
+  "rowFilter.Orders.createdAt": string;
+  "rowFilter.Orders.updatedAt": string;
+  "rowFilter.Orders.MemberId": string;
+  "rowFilter.Orders.fts": string;
+  /** WholesaleOrders */
+  "body.WholesaleOrders": definitions["WholesaleOrders"];
+  "rowFilter.WholesaleOrders.id": string;
+  "rowFilter.WholesaleOrders.vendor": string;
+  "rowFilter.WholesaleOrders.notes": string;
+  "rowFilter.WholesaleOrders.status": string;
+  "rowFilter.WholesaleOrders.payment_status": string;
+  "rowFilter.WholesaleOrders.shipment_status": string;
+  "rowFilter.WholesaleOrders.createdAt": string;
+  "rowFilter.WholesaleOrders.updatedAt": string;
   /** products */
   "body.products": definitions["products"];
   "rowFilter.products.id": string;
@@ -1043,6 +1077,7 @@ export interface parameters {
   "rowFilter.products.updatedAt": string;
   "rowFilter.products.count_on_hand": string;
   "rowFilter.products.no_backorder": string;
+  "rowFilter.products.fts": string;
   /** stock */
   "body.stock": definitions["stock"];
   "rowFilter.stock.variation_id": string;
@@ -1054,16 +1089,6 @@ export interface parameters {
   "rowFilter.stock.sku": string;
   "rowFilter.stock.item_id": string;
   "rowFilter.stock.created_at": string;
-  /** wholesaleorders */
-  "body.wholesaleorders": definitions["wholesaleorders"];
-  "rowFilter.wholesaleorders.id": string;
-  "rowFilter.wholesaleorders.vendor": string;
-  "rowFilter.wholesaleorders.notes": string;
-  "rowFilter.wholesaleorders.status": string;
-  "rowFilter.wholesaleorders.payment_status": string;
-  "rowFilter.wholesaleorders.shipment_status": string;
-  "rowFilter.wholesaleorders.createdAt": string;
-  "rowFilter.wholesaleorders.updatedAt": string;
 }
 
 export interface operations {}
