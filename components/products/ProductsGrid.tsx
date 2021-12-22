@@ -11,14 +11,27 @@ function formatPrice(product: Product) {
   }
   const u_price = parseFloat(`${product.u_price}`).toFixed(2)
   if (product.ws_price === product.u_price) {
-    return <h2>${u_price}</h2>
+    return (
+      <>
+        <h2>${u_price}</h2>
+        <div>
+          <i>
+            {product.pk && product.pk > 1 ? `${product.pk} pk` : ''}{' '}
+            {product.size}
+          </i>
+        </div>
+      </>
+    )
   }
   const ws_price = parseFloat(`${product.ws_price}`).toFixed(2)
   return (
     <>
       <h2>${ws_price}</h2>{' '}
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <i>{product.pk} pk</i>
+        <i>
+          {product.pk && product.pk > 1 ? `${product.pk} pk` : ''}{' '}
+          {product.size}
+        </i>
         <i>${u_price} ea.</i>
       </div>
     </>
