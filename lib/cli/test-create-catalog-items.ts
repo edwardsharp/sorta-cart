@@ -9,14 +9,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 import superjson from 'superjson'
 
-import {
-  addProductsToCatalog,
-  batchDeleteCatalogObjects,
-  fetchCustomAttributes,
-  mapProductToCustomAttributeValues,
-  fetchTaxes,
-  fetchMeasurementUnits,
-} from '../../services/square'
+import { addProductsToCatalog } from '../../services/square'
 
 const main = async () => {
   // gawd need to delete UGXILB5H64X7C5NDPOEJDR2W and D4IGOKEF6P4QJO4EEP26K2DP
@@ -26,29 +19,39 @@ const main = async () => {
   // ])
   // console.log('deleteRes:', deleteRes)
 
-  console.log('gonna fetchTaxes')
-  const fetchTaxesResult = await fetchTaxes()
-  console.log(
-    'fetchTaxesResult.result:',
-    fetchTaxesResult.result,
-    superjson.stringify(fetchTaxesResult.result)
-  )
+  // console.log('gonna fetchTaxes')
+  // const fetchTaxesResult = await fetchTaxes()
+  // console.log(
+  //   'fetchTaxesResult.result:',
+  //   fetchTaxesResult.result,
+  //   superjson.stringify(fetchTaxesResult.result)
+  // )
 
-  console.log('gonna fetchMeasurementUnits')
-  const fetchMeasurementUnitsResult = await fetchMeasurementUnits()
-  console.log(
-    'fetchMeasurementUnitsResult.result:',
-    fetchMeasurementUnitsResult.result,
-    superjson.stringify(fetchMeasurementUnitsResult.result)
-  )
+  // console.log('gonna fetchMeasurementUnits')
+  // const fetchMeasurementUnitsResult = await fetchMeasurementUnits()
+  // console.log(
+  //   'fetchMeasurementUnitsResult.result:',
+  //   fetchMeasurementUnitsResult.result,
+  //   superjson.stringify(fetchMeasurementUnitsResult.result)
+  // )
 
-  console.log('gonna fetchCustomAttributes')
-  const customAttributesRes = await fetchCustomAttributes()
-  console.log(
-    'customAttributesRes.result:',
-    customAttributesRes.result,
-    superjson.stringify(customAttributesRes.result)
-  )
+  // console.log('gonna fetchCustomAttributes')
+  // const customAttributesRes = await fetchCustomAttributes()
+  // console.log(
+  //   'customAttributesRes.result:',
+  //   customAttributesRes.result,
+  //   superjson.stringify(customAttributesRes.result)
+  // )
+  // const mapProductResult = await mapProductToCustomAttributeValues(
+  //   exampleProduct
+  // )
+  // console.log('mapProductResult:', mapProductResult)
+  // const searchCatalogResult = await searchCatalog(exampleProduct.id)
+  // console.log(
+  //   'zomg searchCatalogResult:',
+  //   searchCatalogResult,
+  //   superjson.stringify(searchCatalogResult)
+  // )
 
   const exampleProduct = {
     unf: '68851',
@@ -60,7 +63,7 @@ const main = async () => {
     size: '12 oz',
     unit_type: 'CS',
     ws_price: 58.91,
-    u_price: 7.36,
+    u_price: 9.09,
     ws_price_cost: 58.91,
     u_price_cost: 7.36,
     codes: '2, g',
@@ -78,11 +81,6 @@ const main = async () => {
     description:
       'Turkey, Ground, Extra Lean, Gluten-Free, Frozen, Organic Prairie',
   }
-
-  const mapProductResult = await mapProductToCustomAttributeValues(
-    exampleProduct
-  )
-  console.log('mapProductResult:', mapProductResult)
 
   console.log('gonna addProductsToCatalog()')
   const result = await addProductsToCatalog([exampleProduct])

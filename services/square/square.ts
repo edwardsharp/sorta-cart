@@ -363,24 +363,24 @@ export function validateWebhookSignature(props: {
 
 // adding products to catalog
 
-export async function batchDeleteCatalogObjects(objectIds: string[]) {
+async function batchDeleteCatalogObjects(objectIds: string[]) {
   return await catalogApi.batchDeleteCatalogObjects({ objectIds })
 }
 
-export async function fetchCustomAttributes() {
+async function fetchCustomAttributes() {
   return await catalogApi.searchCatalogObjects({
     objectTypes: ['CUSTOM_ATTRIBUTE_DEFINITION'],
   })
 }
 
-export async function fetchTaxes() {
+async function fetchTaxes() {
   // #TODO cache result in global var
   return await catalogApi.searchCatalogObjects({
     objectTypes: ['TAX'],
   })
 }
 
-export async function fetchMeasurementUnits() {
+async function fetchMeasurementUnits() {
   // #TODO cache result in global var
   return await catalogApi.searchCatalogObjects({
     objectTypes: ['MEASUREMENT_UNIT'],
@@ -395,10 +395,8 @@ function hasOwnProperty<X extends {}, Y extends PropertyKey>(
 }
 
 type CatalogCustomAttributeValues = Record<string, CatalogCustomAttributeValue>
-// : Promise<CustomAttributeValue | undefined>
 
-// customAttributeValues?: ;
-export async function mapProductToCustomAttributeValues(product: Product) {
+async function mapProductToCustomAttributeValues(product: Product) {
   const {
     result: { objects },
   } = await fetchCustomAttributes()
@@ -429,63 +427,6 @@ export async function mapProductToCustomAttributeValues(product: Product) {
 
     return acc
   }, {} as CatalogCustomAttributeValues)
-  // so need to return something like:
-  // pk: {
-  //   key: pkCustomAttribute.customAttributeDefinitionData?.key,
-  //   customAttributeDefinitionId: pkCustomAttribute.id,
-  //   name: pkCustomAttribute.customAttributeDefinitionData?.name,
-  //   type: pkCustomAttribute.customAttributeDefinitionData?.type,
-  //   numberValue: '10', // hmm, string?
-  // },
-  // vendor: {
-  //   key: vendorCustomAttribute.customAttributeDefinitionData
-  //     ?.key,
-  //   customAttributeDefinitionId: vendorCustomAttribute.id,
-  //   name: vendorCustomAttribute.customAttributeDefinitionData
-  //     ?.name,
-  //   type: vendorCustomAttribute.customAttributeDefinitionData
-  //     ?.type,
-  //   stringValue: 'test vendor',
-  // },
-
-  // return []
-  // result like:
-  // {
-  //   "type": "CUSTOM_ATTRIBUTE_DEFINITION",
-  //   "id": "AQG5EGVODBU2GCPRDMRQ373I",
-  //   "updatedAt": "2021-12-26T01:38:30.194Z",
-  //   "version": "1640482710194",
-  //   "isDeleted": false,
-  //   "presentAtAllLocations": true,
-  //   "customAttributeDefinitionData": {
-  //     "type": "STRING",
-  //     "name": "id",
-  //     "sourceApplication": { "applicationId": "Square" },
-  //     "allowedObjectTypes": ["ITEM", "ITEM_VARIATION"],
-  //     "sellerVisibility": "SELLER_VISIBILITY_READ_WRITE_VALUES",
-  //     "appVisibility": "APP_VISIBILITY_READ_WRITE_VALUES",
-  //     "stringConfig": { "enforceUniqueness": false },
-  //     "key": "71b38d9f-5946-4975-8878-ecb62b9c8634"
-  //   }
-  // },
-  // {
-  //   "type": "CUSTOM_ATTRIBUTE_DEFINITION",
-  //   "id": "GUBHFRQUWAVW5PFCCUOAQ5JC",
-  //   "updatedAt": "2021-12-26T01:40:00.428Z",
-  //   "version": "1640482800428",
-  //   "isDeleted": false,
-  //   "presentAtAllLocations": true,
-  //   "customAttributeDefinitionData": {
-  //     "type": "NUMBER",
-  //     "name": "pk",
-  //     "sourceApplication": { "applicationId": "Square" },
-  //     "allowedObjectTypes": ["ITEM", "ITEM_VARIATION"],
-  //     "sellerVisibility": "SELLER_VISIBILITY_READ_WRITE_VALUES",
-  //     "appVisibility": "APP_VISIBILITY_READ_WRITE_VALUES",
-  //     "numberConfig": { "precision": 0 },
-  //     "key": "24e58509-16b4-495f-bc4a-7f00af89edac"
-  //   }
-  // },
 }
 
 async function getMeasurementUnitId(size?: string) {
@@ -519,6 +460,31 @@ async function getMeasurementUnitId(size?: string) {
   }
 }
 
+async function searchCatalogForIdCustomAttribute(stringFilter: string) {
+  const {
+    result: { objects },
+  } = await fetchCustomAttributes()
+  console.log('fetchCustomAttributes result objects:', objects)
+
+  if (!objects) {
+    throw new Error('onoz! no custom attributes found!')
+  }
+
+  const customAttributeDefinitionId = objects.find(
+    (o) => o.customAttributeDefinitionData?.name === 'id'
+  )?.id
+
+  if (!customAttributeDefinitionId) {
+    throw new Error(
+      'onoz! customAttributeDefinitionId for id custom attribute not found!'
+    )
+  }
+
+  return await catalogApi.searchCatalogItems({
+    customAttributeFilters: [{ customAttributeDefinitionId, stringFilter }],
+  })
+}
+
 export async function addProductsToCatalog(products: Product[]) {
   const {
     result: { objects },
@@ -526,12 +492,39 @@ export async function addProductsToCatalog(products: Product[]) {
   const taxIds = objects?.map((o) => o.id)
   console.log('zomg the tax obj', taxIds)
 
+  // #TODO first need to check if this product is already in the catalog,
+  //   either one at a time, or fetch all catalog items first? :hmm:
   // #TODO map products
   const product = products[0]
 
   if (product.u_price === undefined) {
     throw new Error('onoz! product.u_price is undefined')
   }
+
+  const {
+    result: { items },
+  } = await searchCatalogForIdCustomAttribute(product.id)
+
+  const itemId = (items && items[0] && items[0].id) || `#${product.id}`
+  const variationId =
+    (items &&
+      items[0] &&
+      items[0].itemData?.variations &&
+      items[0].itemData?.variations[0].id) ||
+    `#VARIATION${product.id}`
+  const itemVersion = items && items[0] && items[0].version
+  const variationVerson =
+    items &&
+    items[0] &&
+    items[0].itemData?.variations &&
+    items[0].itemData?.variations[0].version
+
+  console.log(
+    '\n!!!!!!!!!\n\n!!!!!!!!!!\n\n existing product found????',
+    itemId,
+    variationId,
+    '\n!!!!!!!!!!!!\n!!!!!!!\n\n'
+  )
   const customAttributeValues = await mapProductToCustomAttributeValues(product)
   const measurementUnitId = await getMeasurementUnitId(product?.size)
   const name = `${product.name} -- ${product.description}`
@@ -549,7 +542,7 @@ export async function addProductsToCatalog(products: Product[]) {
    * the value is not editable on the Seller Dashboard, Square Point of Sale
    * or Retail Point of Sale apps unless it is updated to fit the expected format.
    */
-  const upc_code = product.upc_code?.replace('-', '')
+  const upc_code = product.upc_code?.replace(/-/g, '')
   const upc =
     upc_code && upc_code.length > 11 && upc_code.length < 15
       ? upc_code
@@ -561,14 +554,16 @@ export async function addProductsToCatalog(products: Product[]) {
     {
       objects: [
         {
-          id: `#${product.id}`,
+          id: itemId,
+          version: itemVersion,
           type: 'ITEM',
           itemData: {
             name,
             taxIds,
             variations: [
               {
-                id: `#VARIATION${product.id}`,
+                id: variationId,
+                version: variationVerson,
                 type: 'ITEM_VARIATION',
                 customAttributeValues,
                 itemVariationData: {
