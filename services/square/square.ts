@@ -361,20 +361,29 @@ export function validateWebhookSignature(props: {
   return checkHash === signature
 }
 
-// adding products to catalog
+/*
+ * adding products to catalog
+ *
+ * all the stuff below relates to creating or updating products,
+ * as well as stocking those items' inventory.
+ * the idea here is to go from a wholesale order -> square inventory.
+ * currently not planning on putting every supabase product into the square catalog
+ * so we just create them only when there's inventory received (via a wholesale order).
+ */
 
-async function batchDeleteCatalogObjects(objectIds: string[]) {
-  return await catalogApi.batchDeleteCatalogObjects({ objectIds })
-}
+// #TODO: figure out when deleting items is needed...
+// async function batchDeleteCatalogObjects(objectIds: string[]) {
+//   return await catalogApi.batchDeleteCatalogObjects({ objectIds })
+// }
 
 async function fetchCustomAttributes() {
+  // #TODO cache result in global var
   return await catalogApi.searchCatalogObjects({
     objectTypes: ['CUSTOM_ATTRIBUTE_DEFINITION'],
   })
 }
 
 async function fetchTaxes() {
-  // #TODO cache result in global var
   return await catalogApi.searchCatalogObjects({
     objectTypes: ['TAX'],
   })
@@ -443,8 +452,7 @@ async function getMeasurementUnitId(size?: string) {
     // superjson.stringify(fetchMeasurementUnitsResult.result)
   )
 
-  // moz[0].measurementUnitData.measurementUnit.weightUnit
-  // IMPERIAL_WEIGHT_OUNCE
+  // IMPERIAL_WEIGHT_OUNCE | IMPERIAL_POUND ..any others needed?
   if (size.match(/oz/i)) {
     return objects?.find(
       (o) =>
@@ -492,8 +500,6 @@ export async function addProductsToCatalog(products: Product[]) {
   const taxIds = objects?.map((o) => o.id)
   console.log('zomg the tax obj', taxIds)
 
-  // #TODO first need to check if this product is already in the catalog,
-  //   either one at a time, or fetch all catalog items first? :hmm:
   // #TODO map products
   const product = products[0]
 
@@ -505,6 +511,10 @@ export async function addProductsToCatalog(products: Product[]) {
     result: { items },
   } = await searchCatalogForIdCustomAttribute(product.id)
 
+  // so if the product exists, need to pass the item and variation id in the request
+  // note: if doesn't exist, prefix id with # to indicate new product
+  // the point of the # is that it can be referenced by other objects in the same batch request.
+  // ...might be that undefined is fine for new products??
   const itemId = (items && items[0] && items[0].id) || `#${product.id}`
   const variationId =
     (items &&
@@ -512,6 +522,7 @@ export async function addProductsToCatalog(products: Product[]) {
       items[0].itemData?.variations &&
       items[0].itemData?.variations[0].id) ||
     `#VARIATION${product.id}`
+  // when updating existing square catalog items need to send along version
   const itemVersion = items && items[0] && items[0].version
   const variationVerson =
     items &&
@@ -519,12 +530,6 @@ export async function addProductsToCatalog(products: Product[]) {
     items[0].itemData?.variations &&
     items[0].itemData?.variations[0].version
 
-  console.log(
-    '\n!!!!!!!!!\n\n!!!!!!!!!!\n\n existing product found????',
-    itemId,
-    variationId,
-    '\n!!!!!!!!!!!!\n!!!!!!!\n\n'
-  )
   const customAttributeValues = await mapProductToCustomAttributeValues(product)
   const measurementUnitId = await getMeasurementUnitId(product?.size)
   const name = `${product.name} -- ${product.description}`
@@ -532,6 +537,12 @@ export async function addProductsToCatalog(products: Product[]) {
   const sku = product.plu ? product.plu : product.upc_code
 
   /*
+   * hmm, not sure if storing upc in square catalog is useful for anything?
+   * ...it might be that the square POS register's bar code scanner will look at
+   * product's sku (and not upc); dunno for sure.
+   * #TODO: figure out if this is needed, if not, yank it.
+   *
+   * from square api docz:
    * The universal product code (UPC) of the item variation, if any.
    * This is a searchable attribute for use in applicable query filters.
    *
@@ -548,7 +559,7 @@ export async function addProductsToCatalog(products: Product[]) {
       ? upc_code
       : undefined
 
-  // #TODO get a category id
+  // #TODO get a category id or create a new category if it doesn't exist.
 
   const batches: CatalogObjectBatch[] = [
     {
