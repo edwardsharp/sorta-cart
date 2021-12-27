@@ -1,15 +1,19 @@
 import {
   BatchRetrieveInventoryCountsResponse,
+  BatchUpsertCatalogObjectsRequest,
+  CatalogCustomAttributeValue,
   CatalogObject,
+  CatalogObjectBatch,
   Client,
   Environment,
   InventoryCount,
   StandardUnitDescription,
 } from 'square'
 import { isDeepStrictEqual } from 'util'
-import crypto from 'crypto'
+import crypto, { randomUUID } from 'crypto'
 
 import { Stock } from '../supabase/stock'
+import { Product } from '../supabase/products'
 
 type CatalogObjectWithQty = CatalogObject & {
   quantity?: number
@@ -241,6 +245,35 @@ export async function getProductsInStock(
   )
 }
 
+interface CustomAttributeValues {
+  [index: string]: string | number | undefined
+}
+function mapCustomAttributes(product: CatalogObjectWithQty) {
+  if (product.itemData?.variations && product.itemData.variations[0]) {
+    const variation = product.itemData.variations[0]
+    if (variation.customAttributeValues) {
+      return Object.values(variation.customAttributeValues).reduce(
+        (acc, cav) => {
+          const { name, type } = cav
+          if (!name) {
+            return acc
+          }
+          let value: string | number | undefined
+          if (type === 'STRING') {
+            value = cav.stringValue
+          } else if (type === 'NUMBER') {
+            value = Number(cav.numberValue)
+          }
+          acc[name] = value
+          return acc
+        },
+        {} as CustomAttributeValues
+      )
+    }
+  }
+  return null
+}
+
 export function mapProductsToStock(products: CatalogObjectWithQty[]): Stock[] {
   return products.map((product) => {
     const priceMaybeBigInt =
@@ -258,6 +291,10 @@ export function mapProductsToStock(products: CatalogObjectWithQty[]): Stock[] {
     const variation_id =
       (product.itemData?.variations && product.itemData.variations[0].id) || ''
 
+    // customAttributeValues
+    const cav = mapCustomAttributes(product)
+    console.log('zomg cav:', cav)
+
     return {
       name: product.itemData?.name,
       description: product.itemData?.description,
@@ -267,6 +304,7 @@ export function mapProductsToStock(products: CatalogObjectWithQty[]): Stock[] {
       sku,
       item_id,
       variation_id,
+      ...cav,
     }
   })
 }
@@ -321,4 +359,246 @@ export function validateWebhookSignature(props: {
   // )
 
   return checkHash === signature
+}
+
+// adding products to catalog
+
+export async function batchDeleteCatalogObjects(objectIds: string[]) {
+  return await catalogApi.batchDeleteCatalogObjects({ objectIds })
+}
+
+export async function fetchCustomAttributes() {
+  return await catalogApi.searchCatalogObjects({
+    objectTypes: ['CUSTOM_ATTRIBUTE_DEFINITION'],
+  })
+}
+
+export async function fetchTaxes() {
+  // #TODO cache result in global var
+  return await catalogApi.searchCatalogObjects({
+    objectTypes: ['TAX'],
+  })
+}
+
+export async function fetchMeasurementUnits() {
+  // #TODO cache result in global var
+  return await catalogApi.searchCatalogObjects({
+    objectTypes: ['MEASUREMENT_UNIT'],
+  })
+}
+
+function hasOwnProperty<X extends {}, Y extends PropertyKey>(
+  obj: X,
+  prop: Y
+): obj is X & Record<Y, unknown> {
+  return obj.hasOwnProperty(prop)
+}
+
+type CatalogCustomAttributeValues = Record<string, CatalogCustomAttributeValue>
+// : Promise<CustomAttributeValue | undefined>
+
+// customAttributeValues?: ;
+export async function mapProductToCustomAttributeValues(product: Product) {
+  const {
+    result: { objects },
+  } = await fetchCustomAttributes()
+  console.log('fetchCustomAttributes result objects:', objects)
+
+  if (!objects) {
+    return {}
+  }
+  return objects.reduce((acc, object) => {
+    const { customAttributeDefinitionData, id: customAttributeDefinitionId } =
+      object
+    if (customAttributeDefinitionData?.key) {
+      const { key, name, type } = customAttributeDefinitionData
+      if (!hasOwnProperty(product, name)) {
+        return acc
+      }
+
+      acc[key] = {
+        key,
+        customAttributeDefinitionId,
+        name,
+        type,
+        [type === 'NUMBER' ? 'numberValue' : 'stringValue']: String(
+          product[name]
+        ),
+      }
+    }
+
+    return acc
+  }, {} as CatalogCustomAttributeValues)
+  // so need to return something like:
+  // pk: {
+  //   key: pkCustomAttribute.customAttributeDefinitionData?.key,
+  //   customAttributeDefinitionId: pkCustomAttribute.id,
+  //   name: pkCustomAttribute.customAttributeDefinitionData?.name,
+  //   type: pkCustomAttribute.customAttributeDefinitionData?.type,
+  //   numberValue: '10', // hmm, string?
+  // },
+  // vendor: {
+  //   key: vendorCustomAttribute.customAttributeDefinitionData
+  //     ?.key,
+  //   customAttributeDefinitionId: vendorCustomAttribute.id,
+  //   name: vendorCustomAttribute.customAttributeDefinitionData
+  //     ?.name,
+  //   type: vendorCustomAttribute.customAttributeDefinitionData
+  //     ?.type,
+  //   stringValue: 'test vendor',
+  // },
+
+  // return []
+  // result like:
+  // {
+  //   "type": "CUSTOM_ATTRIBUTE_DEFINITION",
+  //   "id": "AQG5EGVODBU2GCPRDMRQ373I",
+  //   "updatedAt": "2021-12-26T01:38:30.194Z",
+  //   "version": "1640482710194",
+  //   "isDeleted": false,
+  //   "presentAtAllLocations": true,
+  //   "customAttributeDefinitionData": {
+  //     "type": "STRING",
+  //     "name": "id",
+  //     "sourceApplication": { "applicationId": "Square" },
+  //     "allowedObjectTypes": ["ITEM", "ITEM_VARIATION"],
+  //     "sellerVisibility": "SELLER_VISIBILITY_READ_WRITE_VALUES",
+  //     "appVisibility": "APP_VISIBILITY_READ_WRITE_VALUES",
+  //     "stringConfig": { "enforceUniqueness": false },
+  //     "key": "71b38d9f-5946-4975-8878-ecb62b9c8634"
+  //   }
+  // },
+  // {
+  //   "type": "CUSTOM_ATTRIBUTE_DEFINITION",
+  //   "id": "GUBHFRQUWAVW5PFCCUOAQ5JC",
+  //   "updatedAt": "2021-12-26T01:40:00.428Z",
+  //   "version": "1640482800428",
+  //   "isDeleted": false,
+  //   "presentAtAllLocations": true,
+  //   "customAttributeDefinitionData": {
+  //     "type": "NUMBER",
+  //     "name": "pk",
+  //     "sourceApplication": { "applicationId": "Square" },
+  //     "allowedObjectTypes": ["ITEM", "ITEM_VARIATION"],
+  //     "sellerVisibility": "SELLER_VISIBILITY_READ_WRITE_VALUES",
+  //     "appVisibility": "APP_VISIBILITY_READ_WRITE_VALUES",
+  //     "numberConfig": { "precision": 0 },
+  //     "key": "24e58509-16b4-495f-bc4a-7f00af89edac"
+  //   }
+  // },
+}
+
+async function getMeasurementUnitId(size?: string) {
+  if (!size) {
+    return undefined
+  }
+  console.log('gonna fetchMeasurementUnits')
+  const {
+    result: { objects },
+  } = await fetchMeasurementUnits()
+  console.log(
+    'fetchMeasurementUnitsResult.result.objects:',
+    objects
+    // superjson.stringify(fetchMeasurementUnitsResult.result)
+  )
+
+  // moz[0].measurementUnitData.measurementUnit.weightUnit
+  // IMPERIAL_WEIGHT_OUNCE
+  if (size.match(/oz/i)) {
+    return objects?.find(
+      (o) =>
+        o.measurementUnitData?.measurementUnit?.weightUnit ===
+        'IMPERIAL_WEIGHT_OUNCE'
+    )?.id
+  }
+  if (size.match(/lb/i)) {
+    return objects?.find(
+      (o) =>
+        o.measurementUnitData?.measurementUnit?.weightUnit === 'IMPERIAL_POUND'
+    )?.id
+  }
+}
+
+export async function addProductsToCatalog(products: Product[]) {
+  const {
+    result: { objects },
+  } = await fetchTaxes()
+  const taxIds = objects?.map((o) => o.id)
+  console.log('zomg the tax obj', taxIds)
+
+  // #TODO map products
+  const product = products[0]
+
+  if (product.u_price === undefined) {
+    throw new Error('onoz! product.u_price is undefined')
+  }
+  const customAttributeValues = await mapProductToCustomAttributeValues(product)
+  const measurementUnitId = await getMeasurementUnitId(product?.size)
+  const name = `${product.name} -- ${product.description}`
+  const amount = BigInt(product.u_price * 100)
+  const sku = product.plu ? product.plu : product.upc_code
+
+  /*
+   * The universal product code (UPC) of the item variation, if any.
+   * This is a searchable attribute for use in applicable query filters.
+   *
+   * The value of this attribute should be a number of 12-14 digits long.
+   * This restriction is enforced on the Square Seller Dashboard, Square Point of Sale
+   * or Retail Point of Sale apps, where this attribute shows in the GTIN field.
+   * If a non-compliant UPC value is assigned to this attribute using the API,
+   * the value is not editable on the Seller Dashboard, Square Point of Sale
+   * or Retail Point of Sale apps unless it is updated to fit the expected format.
+   */
+  const upc_code = product.upc_code?.replace('-', '')
+  const upc =
+    upc_code && upc_code.length > 11 && upc_code.length < 15
+      ? upc_code
+      : undefined
+
+  // #TODO get a category id
+
+  const batches: CatalogObjectBatch[] = [
+    {
+      objects: [
+        {
+          id: `#${product.id}`,
+          type: 'ITEM',
+          itemData: {
+            name,
+            taxIds,
+            variations: [
+              {
+                id: `#VARIATION${product.id}`,
+                type: 'ITEM_VARIATION',
+                customAttributeValues,
+                itemVariationData: {
+                  measurementUnitId,
+                  name,
+                  sku,
+                  upc,
+                  pricingType: 'FIXED_PRICING',
+                  priceMoney: {
+                    amount,
+                    currency: 'USD',
+                  },
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ]
+
+  const req: BatchUpsertCatalogObjectsRequest = {
+    idempotencyKey: randomUUID(),
+    batches,
+  }
+
+  console.log('[square] batchUpsertCatalogObjects req:', req)
+
+  const result = await catalogApi.batchUpsertCatalogObjects(req)
+  // console.log('[square] batchUpsertCatalogObjects result:', result)
+
+  return result
 }

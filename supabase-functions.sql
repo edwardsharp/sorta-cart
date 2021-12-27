@@ -81,3 +81,16 @@ add column description text generated always as (
         coalesce(description_edit, description_orig)
     ) stored;
 --
+-- 
+-- recent orders (for admin dashboard)
+CREATE OR REPLACE FUNCTION recent_orders () RETURNS SETOF public."Orders" AS $$
+SELECT *
+FROM "Orders"
+WHERE "createdAt" BETWEEN NOW()::DATE - EXTRACT(
+        DOW
+        FROM NOW()
+    )::INTEGER -14
+    AND NOW()
+ORDER BY "createdAt" DESC;
+$$ LANGUAGE SQL;
+--

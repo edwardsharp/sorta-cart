@@ -8,7 +8,9 @@
     "lint": "next lint",
     "test": "jest",
     "test:snapshot": "jest --updateSnapshot",
-    "import-all-square-stock": "ts-node lib/cli/import-all-square-stock.ts"
+    "import-all-square-stock": "ts-node lib/cli/import-all-square-stock.ts",
+    "get-all-square-stock": "ts-node lib/cli/get-all-square-stock.ts",
+    "test-create-catalog-items": "ts-node lib/cli/test-create-catalog-items.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^1.28.5",
