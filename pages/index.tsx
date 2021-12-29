@@ -1,5 +1,6 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import Link from 'next/link'
 import ProductsCard from '../components/products/ProductsCard'
 import StockCard from '../components/stock/StockCard'
 
@@ -18,23 +19,25 @@ const Home: NextPage = () => {
         <h1 className={styles.title}>SORTA-CART</h1>
 
         <div className={styles.grid}>
-          <a href="/products" className={styles.card}>
-            <ProductsCard />
-          </a>
-          <a href="/stock" className={styles.card}>
-            <StockCard />
-          </a>
+          <Link href="/products">
+            <a className={styles.card}>
+              <ProductsCard />
+            </a>
+          </Link>
+          <Link href="/stock">
+            <a className={styles.card}>
+              <StockCard />
+            </a>
+          </Link>
         </div>
       </main>
 
       <footer className={styles.footer}>
-        <a
-          href="https://github.com/edwardsharp"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          made with ♥ in NYC
-        </a>
+        <Link href="https://github.com/edwardsharp">
+          <a target="_blank" rel="noopener noreferrer">
+            made with ♥ in NYC
+          </a>
+        </Link>
       </footer>
     </div>
   )
