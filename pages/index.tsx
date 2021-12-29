@@ -9,13 +9,13 @@ const Home: NextPage = () => {
   return (
     <div>
       <Head>
-        <title>MARSH COOP</title>
+        <title>SORTA-CART</title>
         <meta name="description" content="MARSH COOP" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>MARSHCOOP</h1>
+        <h1 className={styles.title}>SORTA-CART</h1>
 
         <div className={styles.grid}>
           <a href="/products" className={styles.card}>
@@ -33,7 +33,7 @@ const Home: NextPage = () => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          made with {'<3'} in NYC
+          made with ♥ in NYC
         </a>
       </footer>
     </div>

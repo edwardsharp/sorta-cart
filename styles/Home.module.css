@@ -26,7 +26,7 @@
 }
 
 .title a {
-  color: #0070f3;
+  color: lightpink;
   text-decoration: none;
 }
 
@@ -85,8 +85,9 @@
 .card:hover,
 .card:focus,
 .card:active {
-  color: #0070f3;
-  border-color: #0070f3;
+  color: black;
+  border-color: lightpink;
+  box-shadow: 0 5px 0 0 lightpink;
 }
 
 .card h2 {

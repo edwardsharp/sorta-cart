@@ -4,13 +4,26 @@ import { supabase } from './supabase'
 export type Product = definitions['products']
 
 export async function getProducts(limit = 1000) {
-  const { data: products, error } = await supabase
+  const {
+    data: products,
+    error,
+    count,
+  } = await supabase
     .from<Product>('products')
-    .select()
+    .select('*', { count: 'exact' })
     .limit(limit)
 
   if (error) throw new Error(error.message)
   return products
+}
+
+export async function getProductsCount() {
+  const { error, count } = await supabase
+    .from<Product>('products')
+    .select('*', { count: 'exact' })
+
+  if (error) throw new Error(error.message)
+  return count
 }
 
 export async function getCategories(): Promise<{ [index: string]: string }> {

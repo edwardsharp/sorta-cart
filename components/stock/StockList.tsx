@@ -46,11 +46,11 @@ export default function StockList() {
         }}
       >
         <div>{stock.length} Stock</div>
-        <div>
+        {/* <div>
           <input type="search" placeholder="Search" />
 
           <button>:)</button>
-        </div>
+        </div> */}
       </div>
 
       <div className={styles.grid}>
