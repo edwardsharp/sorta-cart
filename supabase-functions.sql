@@ -94,3 +94,16 @@ WHERE "createdAt" BETWEEN NOW()::DATE - EXTRACT(
 ORDER BY "createdAt" DESC;
 $$ LANGUAGE SQL;
 --
+-- 
+-- default products sorting and stuff
+CREATE OR REPLACE FUNCTION default_products () RETURNS SETOF public.products AS $$
+SELECT *
+FROM products
+ORDER BY array_position(
+        ARRAY ['MARSH SCHEDULE','MUTUAL AID','MUTUAL AID','MARSH','ALBERT''S FRESH','ALBERT''S PRODUCE','CHILL','REFRIGERATED','FROZEN','GROCERY','GROCERY & BEVERAGES','PERSONAL CARE','BULK', 'BULK FOODS''SUPPLEMENTS'],
+        category
+    ),
+    sub_category;
+$$ LANGUAGE SQL;
+-- 
+--

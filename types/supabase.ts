@@ -433,6 +433,7 @@ export interface paths {
           square_status?: parameters["rowFilter.WholesaleOrders.square_status"];
           square_loaded_at?: parameters["rowFilter.WholesaleOrders.square_loaded_at"];
           data?: parameters["rowFilter.WholesaleOrders.data"];
+          api_key?: parameters["rowFilter.WholesaleOrders.api_key"];
           /** Filtering Columns */
           select?: parameters["select"];
           /** Ordering */
@@ -495,6 +496,7 @@ export interface paths {
           square_status?: parameters["rowFilter.WholesaleOrders.square_status"];
           square_loaded_at?: parameters["rowFilter.WholesaleOrders.square_loaded_at"];
           data?: parameters["rowFilter.WholesaleOrders.data"];
+          api_key?: parameters["rowFilter.WholesaleOrders.api_key"];
         };
         header: {
           /** Preference */
@@ -521,6 +523,7 @@ export interface paths {
           square_status?: parameters["rowFilter.WholesaleOrders.square_status"];
           square_loaded_at?: parameters["rowFilter.WholesaleOrders.square_loaded_at"];
           data?: parameters["rowFilter.WholesaleOrders.data"];
+          api_key?: parameters["rowFilter.WholesaleOrders.api_key"];
         };
         body: {
           /** WholesaleOrders */
@@ -915,6 +918,23 @@ export interface paths {
       };
     };
   };
+  "/rpc/default_products": {
+    post: {
+      parameters: {
+        body: {
+          args: { [key: string]: unknown };
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferParams"];
+        };
+      };
+      responses: {
+        /** OK */
+        200: unknown;
+      };
+    };
+  };
 }
 
 export interface definitions {
@@ -1110,6 +1130,11 @@ export interface definitions {
     square_loaded_at?: string;
     /** Format: jsonb */
     data?: string;
+    /**
+     * Format: uuid
+     * @default extensions.uuid_generate_v4()
+     */
+    api_key: string;
   };
   products: {
     /** Format: text */
@@ -1369,6 +1394,8 @@ export interface parameters {
   "rowFilter.WholesaleOrders.square_loaded_at": string;
   /** Format: jsonb */
   "rowFilter.WholesaleOrders.data": string;
+  /** Format: uuid */
+  "rowFilter.WholesaleOrders.api_key": string;
   /** @description products */
   "body.products": definitions["products"];
   /** Format: text */
