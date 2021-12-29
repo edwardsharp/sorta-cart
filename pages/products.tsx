@@ -6,8 +6,8 @@ const ProductsPage: NextPage = () => {
   return (
     <>
       <Head>
-        <title>MARSH COOP</title>
-        <meta name="description" content="MARSH COOP" />
+        <title>SORTA-CART | PRODUCTS</title>
+        <meta name="description" content="SORTA-CART" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

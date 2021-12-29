@@ -10,7 +10,7 @@ const Home: NextPage = () => {
     <div>
       <Head>
         <title>SORTA-CART</title>
-        <meta name="description" content="MARSH COOP" />
+        <meta name="description" content="SORTA-CART" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -29,7 +29,7 @@ const Home: NextPage = () => {
 
       <footer className={styles.footer}>
         <a
-          href="https://github.com/marshlife-art"
+          href="https://github.com/edwardsharp"
           target="_blank"
           rel="noopener noreferrer"
         >

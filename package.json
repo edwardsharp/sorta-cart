@@ -1,5 +1,5 @@
 {
-  "name": "marshcoop",
+  "name": "sorta-cart",
   "private": true,
   "scripts": {
     "dev": "next dev",

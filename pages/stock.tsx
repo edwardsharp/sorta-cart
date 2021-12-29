@@ -6,8 +6,8 @@ const StockPage: NextPage = () => {
   return (
     <>
       <Head>
-        <title>MARSH COOP</title>
-        <meta name="description" content="MARSH COOP" />
+        <title>SORTA-CART | STOCK</title>
+        <meta name="description" content="SORTA-CART" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
