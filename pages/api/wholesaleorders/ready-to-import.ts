@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { defaultCorsMiddleware } from '../../../lib/cors-middleware'
+import { addInventory, addProductToCatalog } from '../../../services/square'
 import { Product } from '../../../services/supabase/products'
 import { getSupabaseServiceRoleClient } from '../../../services/supabase/supabase'
 import { definitions } from '../../../types/supabase'
@@ -47,12 +48,12 @@ export default async function handler(
     req.body
   )
 
-  const response = await createSquareProducts(req.body.api_key)
+  const response = await parseWholesaleOrderData(req.body.api_key)
 
   res.status(200).json(response)
 }
 
-async function createSquareProducts(api_key?: string): Promise<Data> {
+async function parseWholesaleOrderData(api_key?: string): Promise<Data> {
   if (!api_key) {
     return { ok: false }
   }
@@ -81,14 +82,48 @@ async function createSquareProducts(api_key?: string): Promise<Data> {
   }
   const items = Object.values(jdata.groupedLineItems)
 
-  for (const item of items) {
+  // const products = items.map((item) => item.product) as Product[]
+  console.log('gonna addProductToCatalog products.length:', items.length)
+
+  for await (const item of items) {
     console.log(
       'zomg need to add:',
       item.qtyAdjustments,
       ' for item:',
       item.description
     )
+
+    const { product, qtyAdjustments } = item
+    await addProductAndInventory(product as Product, qtyAdjustments)
   }
 
   return { ok: true }
+}
+
+async function addProductAndInventory(
+  product: Product,
+  qtyAdjustments: number
+) {
+  if (!product) {
+    console.warn('eek no product for this item')
+    return
+  }
+  const { result, variationId } = await addProductToCatalog(product)
+  console.log(
+    'zomg addProductToCatalog() variationId, result:',
+    variationId
+    // result
+  )
+  if (variationId) {
+    console.log(
+      'gonna addInventory! variationId, qtyAdjustments:',
+      variationId,
+      qtyAdjustments
+    )
+    const rez = await addInventory(variationId, qtyAdjustments)
+    if (rez?.result.errors) {
+      console.warn('[addInventory] rez.result.errors:', rez.result.errors)
+    }
+    console.log('addInventory rez', rez)
+  }
 }

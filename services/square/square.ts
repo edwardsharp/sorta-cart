@@ -30,7 +30,7 @@ export const client = new Client({
   accessToken: SQUARE_ACCESS_TOKEN,
 })
 
-const { inventoryApi, catalogApi } = client
+const { inventoryApi, catalogApi, locationsApi } = client
 
 export async function batchRetrieveInventoryCounts(
   catalogObjectIds?: string[]
@@ -272,7 +272,10 @@ function mapCustomAttributes(product: CatalogObjectWithQty) {
   return null
 }
 
-export function mapProductsToStock(products: CatalogObjectWithQty[]): Stock[] {
+export function mapProductsToStock(
+  products: CatalogObjectWithQty[],
+  includeCav: boolean = true
+): Stock[] {
   return products.map((product) => {
     const priceMaybeBigInt =
       (product.itemData &&
@@ -290,7 +293,7 @@ export function mapProductsToStock(products: CatalogObjectWithQty[]): Stock[] {
       (product.itemData?.variations && product.itemData.variations[0].id) || ''
 
     // customAttributeValues
-    const cav = mapCustomAttributes(product)
+    const cav = includeCav ? mapCustomAttributes(product) : undefined
 
     return {
       name: product.itemData?.name,
@@ -435,10 +438,11 @@ async function mapProductToCustomAttributeValues(product: Product) {
   }, {} as CatalogCustomAttributeValues)
 }
 
-async function getMeasurementUnitId(size?: string) {
-  if (!size) {
+async function getMeasurementUnitId(product?: Product) {
+  if (!product || !product.plu || !product.size) {
     return undefined
   }
+
   const {
     result: { objects },
   } = await fetchMeasurementUnits()
@@ -449,14 +453,14 @@ async function getMeasurementUnitId(size?: string) {
   // )
 
   // IMPERIAL_WEIGHT_OUNCE | IMPERIAL_POUND ..any others needed?
-  if (size.match(/oz/i)) {
+  if (product.size.match(/oz/i)) {
     return objects?.find(
       (o) =>
         o.measurementUnitData?.measurementUnit?.weightUnit ===
         'IMPERIAL_WEIGHT_OUNCE'
     )?.id
   }
-  if (size.match(/lb/i)) {
+  if (product.size.match(/lb/i)) {
     return objects?.find(
       (o) =>
         o.measurementUnitData?.measurementUnit?.weightUnit === 'IMPERIAL_POUND'
@@ -538,14 +542,14 @@ async function getCategoryId(category?: string, sub_category?: string) {
   return undefined
 }
 
-export async function addProductsToCatalog(products: Product[]) {
+export async function addProductToCatalog(product: Product) {
   const {
     result: { objects },
   } = await fetchTaxes()
   const taxIds = objects?.map((o) => o.id)
 
-  // #TODO map products
-  const product = products[0]
+  // #TODO map products?
+  // const product = products[0]
 
   if (product.u_price === undefined) {
     throw new Error('onoz! product.u_price is undefined')
@@ -580,7 +584,7 @@ export async function addProductsToCatalog(products: Product[]) {
     items[0].itemData?.variations[0].version
 
   const customAttributeValues = await mapProductToCustomAttributeValues(product)
-  const measurementUnitId = await getMeasurementUnitId(product?.size)
+  const measurementUnitId = await getMeasurementUnitId(product)
   const categoryId = await getCategoryId(product.category, product.sub_category)
   const name = `${product.name} -- ${product.description}`
   const amount = BigInt(product.u_price * 100)
@@ -656,5 +660,48 @@ export async function addProductsToCatalog(products: Product[]) {
 
   // console.log('[square] batchUpsertCatalogObjects req:', req)
 
-  return await catalogApi.batchUpsertCatalogObjects(req)
+  const result = await catalogApi.batchUpsertCatalogObjects(req)
+  return { result, variationId }
+}
+
+export async function addInventory(variationId: string, qty: number) {
+  let locationId: string | undefined = undefined
+  if (!locationId) {
+    const {
+      result: { locations },
+    } = await locationsApi.listLocations()
+    if (locations && locations[0].id) {
+      locationId = locations[0].id
+    }
+  }
+  if (!locationId) {
+    console.log('zomg no location id gonna throw!')
+    throw new Error('onoz, error in addStock; no locationId found!')
+  }
+
+  const quantity = `${qty}`
+
+  console.log('gonna batchChangeInventory!!!')
+  try {
+    return await inventoryApi.batchChangeInventory({
+      ignoreUnchangedCounts: true,
+      changes: [
+        {
+          type: 'ADJUSTMENT',
+          adjustment: {
+            catalogObjectId: variationId,
+            quantity,
+            fromState: 'NONE',
+            toState: 'IN_STOCK',
+            locationId,
+            occurredAt: new Date().toISOString(),
+          },
+        },
+      ],
+      idempotencyKey: randomUUID(),
+    })
+  } catch (e) {
+    console.warn('zomg batchChangeInventory caught error:', e)
+    return undefined
+  }
 }

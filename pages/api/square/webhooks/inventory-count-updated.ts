@@ -80,7 +80,7 @@ async function updateStockLevels(
   }
 
   const products = await getProductsInStock(catalogObjectIds)
-  const stock = mapProductsToStock(products)
+  const stock = mapProductsToStock(products, false)
 
   //   console.log(
   //     'zomg  getProductsInStock() length (should be 1):',

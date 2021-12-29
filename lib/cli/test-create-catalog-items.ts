@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 import superjson from 'superjson'
 
-import { addProductsToCatalog } from '../../services/square'
+import { addProductToCatalog } from '../../services/square'
 
 const main = async () => {
   // gawd need to delete UGXILB5H64X7C5NDPOEJDR2W and D4IGOKEF6P4QJO4EEP26K2DP
@@ -55,7 +55,7 @@ const main = async () => {
 
   const exampleProduct = {
     unf: '68851',
-    upc_code: '0-93966-30754-2',
+    upc_code: '093966307542',
     category: "ALBERT'S FRESH",
     sub_category: 'MEATS',
     name: 'ORGANIC PRAIRIE',
@@ -63,7 +63,7 @@ const main = async () => {
     size: '12 oz',
     unit_type: 'CS',
     ws_price: 58.91,
-    u_price: 9.09,
+    u_price: 7.36,
     ws_price_cost: 58.91,
     u_price_cost: 7.36,
     codes: '2, g',
@@ -82,8 +82,8 @@ const main = async () => {
       'Turkey, Ground, Extra Lean, Gluten-Free, Frozen, Organic Prairie',
   }
 
-  console.log('gonna addProductsToCatalog()')
-  const result = await addProductsToCatalog([exampleProduct])
+  console.log('gonna addProductToCatalog()')
+  const result = await addProductToCatalog(exampleProduct)
   console.log(
     'zomg addProductsToCatalog() result:',
     result,
