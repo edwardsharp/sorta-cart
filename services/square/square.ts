@@ -80,8 +80,6 @@ async function getMeasurementUnits(products: CatalogObjectWithQty[]) {
       return acc
     }, [] as string[])
 
-    console.log('zomg measurementUnitIds.length!', measurementUnitIds.length)
-
     const { result: measurementUnitsResult } =
       await catalogApi.batchRetrieveCatalogObjects({
         objectIds: measurementUnitIds,
@@ -163,11 +161,11 @@ export async function addStandardUnitDescription(
 export async function getProductsInStock(
   catalogObjectIds?: string[]
 ): Promise<CatalogObjectWithQty[]> {
-  console.log(
-    `[getProductsInStock] starting. have ${
-      catalogObjectIds && catalogObjectIds.length
-    } catalogObjectIds`
-  )
+  // console.log(
+  //   `[getProductsInStock] starting. have ${
+  //     catalogObjectIds && catalogObjectIds.length
+  //   } catalogObjectIds`
+  // )
   const { counts } = await batchRetrieveInventoryCounts(catalogObjectIds)
 
   const objectIds = counts
@@ -184,13 +182,13 @@ export async function getProductsInStock(
     console.warn('no products found in square! gonna return')
     return []
   }
-  console.log('[getProductsInStock] objectIds.length:', objectIds.length)
-  console.log(
-    '[getProductsInStock] objectIds:',
-    objectIds,
-    ' counts:',
-    JSON.stringify(counts)
-  )
+  // console.log('[getProductsInStock] objectIds.length:', objectIds.length)
+  // console.log(
+  //   '[getProductsInStock] objectIds:',
+  //   objectIds,
+  //   ' counts:',
+  //   JSON.stringify(counts)
+  // )
 
   let products: CatalogObjectWithQty[] = []
 
@@ -293,7 +291,6 @@ export function mapProductsToStock(products: CatalogObjectWithQty[]): Stock[] {
 
     // customAttributeValues
     const cav = mapCustomAttributes(product)
-    console.log('zomg cav:', cav)
 
     return {
       name: product.itemData?.name,
@@ -409,7 +406,7 @@ async function mapProductToCustomAttributeValues(product: Product) {
   const {
     result: { objects },
   } = await fetchCustomAttributes()
-  console.log('fetchCustomAttributes result objects:', objects)
+  // console.log('fetchCustomAttributes result objects:', objects)
 
   if (!objects) {
     return {}
@@ -442,15 +439,14 @@ async function getMeasurementUnitId(size?: string) {
   if (!size) {
     return undefined
   }
-  console.log('gonna fetchMeasurementUnits')
   const {
     result: { objects },
   } = await fetchMeasurementUnits()
-  console.log(
-    'fetchMeasurementUnitsResult.result.objects:',
-    objects
-    // superjson.stringify(fetchMeasurementUnitsResult.result)
-  )
+  // console.log(
+  //   'fetchMeasurementUnitsResult.result.objects:',
+  //   objects
+  //   // superjson.stringify(fetchMeasurementUnitsResult.result)
+  // )
 
   // IMPERIAL_WEIGHT_OUNCE | IMPERIAL_POUND ..any others needed?
   if (size.match(/oz/i)) {
@@ -472,7 +468,7 @@ async function searchCatalogForIdCustomAttribute(stringFilter: string) {
   const {
     result: { objects },
   } = await fetchCustomAttributes()
-  console.log('fetchCustomAttributes result objects:', objects)
+  // console.log('fetchCustomAttributes result objects:', objects)
 
   if (!objects) {
     throw new Error('onoz! no custom attributes found!')
@@ -493,12 +489,60 @@ async function searchCatalogForIdCustomAttribute(stringFilter: string) {
   })
 }
 
+async function getCategoryId(category?: string, sub_category?: string) {
+  let cat: string | undefined
+  if (!category) {
+    cat = sub_category
+  } else if (!sub_category) {
+    cat = category
+  } else {
+    cat = `${category} > ${sub_category}`
+  }
+  if (!cat) {
+    return undefined
+  }
+  const {
+    result: { errors, objects },
+  } = await catalogApi.searchCatalogObjects({
+    objectTypes: ['CATEGORY'],
+    query: {
+      exactQuery: {
+        attributeName: 'name',
+        attributeValue: cat,
+      },
+    },
+  })
+
+  if (objects && objects[0].id) {
+    return objects[0].id
+  }
+
+  const {
+    result: { catalogObject },
+  } = await catalogApi.upsertCatalogObject({
+    idempotencyKey: randomUUID(),
+    object: {
+      type: 'CATEGORY',
+      id: '#new',
+      categoryData: {
+        name: cat,
+      },
+    },
+  })
+
+  if (catalogObject?.id) {
+    return catalogObject.id
+  } else {
+    console.warn('[getCategoryId] i guess could not create new category :/')
+  }
+  return undefined
+}
+
 export async function addProductsToCatalog(products: Product[]) {
   const {
     result: { objects },
   } = await fetchTaxes()
   const taxIds = objects?.map((o) => o.id)
-  console.log('zomg the tax obj', taxIds)
 
   // #TODO map products
   const product = products[0]
@@ -506,6 +550,11 @@ export async function addProductsToCatalog(products: Product[]) {
   if (product.u_price === undefined) {
     throw new Error('onoz! product.u_price is undefined')
   }
+
+  // ! ! ! ! ! !
+  // zomg, should probably just track square_item_id and square_variation_id
+  // on the product record to avoid having to do searchCatalogForIdCustomAttribute
+  // ! ! ! ! ! !
 
   const {
     result: { items },
@@ -532,6 +581,7 @@ export async function addProductsToCatalog(products: Product[]) {
 
   const customAttributeValues = await mapProductToCustomAttributeValues(product)
   const measurementUnitId = await getMeasurementUnitId(product?.size)
+  const categoryId = await getCategoryId(product.category, product.sub_category)
   const name = `${product.name} -- ${product.description}`
   const amount = BigInt(product.u_price * 100)
   const sku = product.plu ? product.plu : product.upc_code
@@ -571,6 +621,7 @@ export async function addProductsToCatalog(products: Product[]) {
           itemData: {
             name,
             taxIds,
+            categoryId,
             variations: [
               {
                 id: variationId,
@@ -587,6 +638,8 @@ export async function addProductsToCatalog(products: Product[]) {
                     amount,
                     currency: 'USD',
                   },
+                  inventoryAlertThreshold: BigInt(1),
+                  inventoryAlertType: 'LOW_QUANTITY',
                 },
               },
             ],
@@ -601,10 +654,7 @@ export async function addProductsToCatalog(products: Product[]) {
     batches,
   }
 
-  console.log('[square] batchUpsertCatalogObjects req:', req)
+  // console.log('[square] batchUpsertCatalogObjects req:', req)
 
-  const result = await catalogApi.batchUpsertCatalogObjects(req)
-  // console.log('[square] batchUpsertCatalogObjects result:', result)
-
-  return result
+  return await catalogApi.batchUpsertCatalogObjects(req)
 }
