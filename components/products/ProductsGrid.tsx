@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { string } from 'square/dist/schema'
 import useSWR from 'swr'
 
 import {
@@ -92,6 +93,41 @@ function useClickAwayListener(
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [ref])
+}
+
+// shout-out to https://usehooks.com/useLocalStorage/
+function useLocalStorage<T>(key: string, initialValue: T) {
+  // State to store our value
+  // Pass initial state function to useState so logic is only executed once
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    try {
+      // Get from local storage by key
+      const item = window.localStorage.getItem(key)
+      // Parse stored json or if none return initialValue
+      return item ? JSON.parse(item) : initialValue
+    } catch (error) {
+      // If error also return initialValue
+      console.log(error)
+      return initialValue
+    }
+  })
+  // Return a wrapped version of useState's setter function that ...
+  // ... persists the new value to localStorage.
+  const setValue = (value: T | ((val: T) => T)) => {
+    try {
+      // Allow value to be a function so we have same API as useState
+      const valueToStore =
+        value instanceof Function ? value(storedValue) : value
+      // Save state
+      setStoredValue(valueToStore)
+      // Save to local storage
+      window.localStorage.setItem(key, JSON.stringify(valueToStore))
+    } catch (error) {
+      // A more advanced implementation would handle the error case
+      console.log(error)
+    }
+  }
+  return [storedValue, setValue] as const
 }
 
 const ProductCard = (props: {
@@ -213,6 +249,90 @@ const Grid = (props: { products: ProductsData; error: any }) => {
         </div>
       ))}
     </>
+  )
+}
+
+interface ShoppingListItem {
+  item: string
+  done: boolean
+}
+const ShoppingList = (props: {
+  searchQ: string
+  setSearchQ: React.Dispatch<React.SetStateAction<string>>
+}) => {
+  const { searchQ, setSearchQ } = props
+  // const [shoppingList, setShoppingList] = useState<
+  //   Array<{ item: string; done: boolean }>
+  // >([])
+
+  const [shoppingList, setShoppingList] = useLocalStorage<ShoppingListItem[]>(
+    'shoppingList',
+    []
+  )
+
+  const onItemChange = (idx: number, item: string) => {
+    setShoppingList((prev) =>
+      prev.map((o, i) => (i === idx ? { item, done: o.done } : o))
+    )
+  }
+  const onDoneChange = (idx: number, done: boolean) => {
+    setShoppingList((prev) =>
+      prev.map((o, i) => (i === idx ? { item: o.item, done } : o))
+    )
+  }
+
+  const deleteItem = (idx: number) => {
+    setShoppingList((prev) => prev.filter((o, i) => i !== idx))
+  }
+
+  return (
+    <div className={styles.shopping_list}>
+      <div className={styles.shopping_list_title}>
+        <span>Shopping list</span>
+        <button
+          onClick={() => {
+            setShoppingList((prev) => [{ item: '', done: false }, ...prev])
+          }}
+          className={styles.add_to_list}
+          title="Add a new item to the shopping list"
+        >
+          +
+        </button>
+      </div>
+      {shoppingList.reverse().map((o, idx) => (
+        <div className={styles.shopping_list_items} key={`shoplist${idx}`}>
+          <input
+            type="checkbox"
+            checked={o.done}
+            onChange={(ev) => onDoneChange(idx, ev.target.checked)}
+          />
+          {o.done ? (
+            <>
+              <span className={styles.done}>{o.item}</span>
+              <button className={styles.item} onClick={() => deleteItem(idx)}>
+                x
+              </button>
+            </>
+          ) : (
+            <>
+              <input
+                className={styles.item}
+                type="text"
+                placeholder="New Item"
+                value={o.item}
+                onChange={(ev) => onItemChange(idx, ev.target.value)}
+              />
+              <button
+                className={styles.item}
+                onClick={() => setSearchQ(o.item)}
+              >
+                search
+              </button>
+            </>
+          )}
+        </div>
+      ))}
+    </div>
   )
 }
 
@@ -378,6 +498,8 @@ export default function ProductGrid() {
                 reset
               </button>
             </div>
+
+            <ShoppingList searchQ={searchQ} setSearchQ={setSearchQ} />
           </div>
         )}
       </div>
