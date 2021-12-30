@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import useSWR from 'swr'
 
 import {
   getCategories,
-  getProducts,
   getSubCategories,
   Product,
 } from '../../services/supabase/products'
@@ -76,6 +75,95 @@ function formatPrice(product: Product) {
   )
 }
 
+function useClickAwayListener(
+  ref: React.RefObject<HTMLElement>,
+  cb: () => void
+) {
+  useEffect(() => {
+    function handleClickOutside(event: any) {
+      if (ref.current && !ref.current.contains(event.target)) {
+        cb()
+      }
+    }
+    // add the event listener
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      // tear down the event listener
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [ref])
+}
+
+const ProductCard = (props: {
+  product: Product
+  style: React.CSSProperties
+}) => {
+  const { product, style: cardStyle } = props
+  const [selected, setSelected] = useState(false)
+  const [selectedStyles, setSelectedStyles] = useState<
+    { height: number; width: number } | object
+  >({})
+  const [count, setCount] = useState(0)
+  const cardRef = useRef<HTMLDivElement>(null)
+  const clickAwayRef = useRef<HTMLDivElement>(null)
+  useClickAwayListener(clickAwayRef, () => setSelected(false))
+
+  const handleContainerClick = (event: any) => {
+    if (cardRef.current) {
+      const clientRect = cardRef.current.getBoundingClientRect()
+      setSelectedStyles({
+        height: clientRect.height - 3,
+        width: clientRect.width - 3,
+      })
+    }
+    if (!selected) {
+      setSelected(true)
+    }
+  }
+
+  const incrementCount = (direction: '-' | '+') => {
+    if (direction === '-') {
+      setCount((prev) => (prev - 1 < 0 ? 0 : prev - 1))
+      return
+    }
+    setCount((prev) => prev + 1)
+  }
+
+  return (
+    <div
+      className={styles.card}
+      style={cardStyle}
+      onClick={handleContainerClick}
+      ref={cardRef}
+    >
+      {selected && (
+        <div
+          className={styles.cardSelected}
+          style={selectedStyles}
+          ref={clickAwayRef}
+        >
+          <div onClick={() => incrementCount('-')}>-</div>
+
+          <input
+            type="number"
+            value={count}
+            onChange={(ev) => setCount(ev.target.valueAsNumber)}
+            min={0}
+          />
+
+          <div onClick={() => incrementCount('+')}>+</div>
+        </div>
+      )}
+      <p>{product.description}</p>
+      <div>{formatPrice(product)}</div>
+      <div>
+        <small>{product.name}</small>
+        <b style={{ marginLeft: 6 }}>{count > 0 && `${count} in cart`}</b>
+      </div>
+    </div>
+  )
+}
+
 interface ProductsGrouped {
   [index: string]: { [index: string]: Product[] }
 }
@@ -113,15 +201,11 @@ const Grid = (props: { products: ProductsData; error: any }) => {
                   </div>
                   {products.grouped &&
                     products.grouped[cat][sub_cat].map((product) => (
-                      <div
-                        key={product.id}
-                        className={styles.card}
+                      <ProductCard
+                        product={product}
                         style={card}
-                      >
-                        <p>{product.description}</p>
-                        <div>{formatPrice(product)}</div>
-                        <small>{product.name}</small>
-                      </div>
+                        key={product.id}
+                      />
                     ))}
                 </div>
               )
@@ -137,6 +221,9 @@ export default function ProductGrid() {
   const [showFilters, setShowFilters] = useState(false)
   const [selectedCatz, setSelectedCatz] = useState<string[]>([])
   const [selectedSubCatz, setSelectedSubCatz] = useState<string[]>([])
+
+  const clickAwayRef = useRef<HTMLDivElement>(null)
+  useClickAwayListener(clickAwayRef, () => setShowFilters(false))
 
   const { data: products, error } = useSWR(
     { key: 'get_product', searchQ, selectedCatz, selectedSubCatz },
@@ -205,7 +292,6 @@ export default function ProductGrid() {
     }
   )
 
-  console.log('cats:', categories, sub_categories)
   return (
     <>
       <div className={styles.search_container}>
@@ -223,22 +309,25 @@ export default function ProductGrid() {
             {products ? `${products.count} products` : 'l o a d i n g . . .'}
           </label>
 
-          <button
-            className={styles.filters_btn}
-            title={`${showFilters ? 'hide' : 'show'} filters`}
-            onClick={() => setShowFilters((prev) => !prev)}
-          >
-            {showFilters ? '✕' : '☷'}
-          </button>
+          {!showFilters && (
+            <button
+              className={styles.filters_btn}
+              title={`${showFilters ? 'hide' : 'show'} filters`}
+              onClick={() => setShowFilters((prev) => !prev)}
+            >
+              {showFilters ? '✕' : '☷'}
+            </button>
+          )}
         </div>
         {showFilters && (
-          <div className={styles.filters}>
+          <div className={styles.filters} ref={clickAwayRef}>
             <label className={styles.cat_label}>
               Category ({categories?.length || 0})
             </label>
             <select
               name="cat-select"
               multiple
+              value={selectedCatz}
               onChange={(e) => {
                 setSelectedCatz(
                   Array.from(e.target.selectedOptions, (option) => option.value)
@@ -247,11 +336,7 @@ export default function ProductGrid() {
               }}
             >
               {categories?.map((cat) => (
-                <option
-                  key={`c${cat}`}
-                  value={cat}
-                  selected={selectedCatz.includes(cat)}
-                >
+                <option key={`c${cat}`} value={cat}>
                   {cat}
                 </option>
               ))}
@@ -265,6 +350,7 @@ export default function ProductGrid() {
                 <select
                   name="sub-cat-select"
                   multiple
+                  value={selectedSubCatz}
                   onChange={(e) =>
                     setSelectedSubCatz(
                       Array.from(
@@ -275,11 +361,7 @@ export default function ProductGrid() {
                   }
                 >
                   {sub_categories?.map((subcat) => (
-                    <option
-                      key={`s${subcat}`}
-                      value={subcat}
-                      selected={selectedSubCatz.includes(subcat)}
-                    >
+                    <option key={`s${subcat}`} value={subcat}>
                       {subcat}
                     </option>
                   ))}

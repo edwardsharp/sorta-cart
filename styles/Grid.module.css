@@ -57,7 +57,8 @@
   font-size: 1rem;
   margin-left: -40px;
   position: absolute;
-  top: 29px;
+  top: 26px;
+  cursor: pointer;
 }
 .filters_btn:hover {
   border-color: black;
@@ -145,6 +146,44 @@
   line-height: 1.1;
 }
 
+.card > .cardSelected {
+  display: flex;
+  position: absolute;
+  margin-top: -1.5rem;
+  margin-left: -1.5rem;
+  padding: 1.5rem;
+  border-radius: 9px;
+  background-color: rgba(255, 255, 255, 0.5);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+.card > .cardSelected > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 0.5rem;
+  font-weight: 800;
+}
+
+.card > .cardSelected > div:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  user-select: none;
+}
+
+.card > .cardSelected > div,
+.card > .cardSelected > input {
+  height: 3.5rem;
+  width: 33%;
+  border: thin solid black;
+  border-width: 2px 4px 8px 4px;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.3);
+  color: white;
+  font-size: 2rem;
+}
+
 .cat {
   position: sticky;
   top: 1rem;
@@ -164,12 +203,23 @@
   padding-bottom: 1rem;
 }
 
+@media (max-width: 1024px) {
+  .search_container {
+    align-items: flex-end;
+    margin-right: 1rem;
+  }
+}
+
 @media (max-width: 600px) {
+  .search_container {
+    align-items: center;
+  }
+
   .search_container label {
     margin-top: 0.5rem;
   }
   .filters_btn {
-    top: 20px;
+    top: 17px;
     padding: 0px 7px;
   }
   .filters {
