@@ -290,7 +290,7 @@ export default function ProductGrid() {
               <button
                 onClick={() => {
                   setSelectedCatz([])
-                  setSelectedCatz([])
+                  setSelectedSubCatz([])
                 }}
               >
                 reset
