@@ -11,7 +11,7 @@
 .search {
   font-size: 1.25rem;
   border: 1px solid lightsteelblue;
-  border-width: 6px 6px 1.5rem 6px;
+  border-width: 4px 6px 1.5rem 6px;
   border-radius: 6px;
   padding: 9px;
   width: 300px;
@@ -21,7 +21,7 @@
 .search_container input {
   margin-bottom: -22px;
   margin-left: -4px;
-  border-radius: 3px;
+  border-radius: 9px;
   /* box-shadow: inset 0px 0px 6px 2px rgba(176, 196, 222, 0.8); */
 }
 
@@ -40,8 +40,8 @@
   border-top-color: black;
   border-left-color: black;
   border-right-color: black;
-  border-bottom-width: 4px;
-  border-top-width: 4px;
+  border-bottom-width: 3px;
+  border-top-width: 3px;
   margin-bottom: 0px;
   box-shadow: none;
 }
