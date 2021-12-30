@@ -166,9 +166,31 @@ function renderCodes(codes?: string) {
   )
 }
 
-function renderAllCodes() {
-  return Object.values(PROPERTY_MAP).map((code, idx) => (
-    <button className={styles.code} key={`allcodez${idx}`}>
+function renderAllCodes(
+  selectedCodes: string[],
+  setSelectedCodes: React.Dispatch<React.SetStateAction<string[]>>
+) {
+  return Object.entries(PROPERTY_MAP).map(([k, code]) => (
+    <button
+      className={styles.code}
+      key={`allcodez${k}`}
+      onClick={() => {
+        setSelectedCodes((prev) => {
+          if (selectedCodes.includes(k)) {
+            return prev.filter((c) => c !== k)
+          }
+          return [k, ...prev]
+        })
+      }}
+      style={
+        selectedCodes.includes(k)
+          ? {
+              backgroundColor: 'black',
+              color: 'white',
+            }
+          : undefined
+      }
+    >
       {code}
     </button>
   ))
@@ -176,15 +198,15 @@ function renderAllCodes() {
 
 function getLabelFor(prop: string): { ascLabel: string; descLabel: string } {
   switch (prop) {
-    case 'price':
+    case 'u_price':
       return {
-        ascLabel: 'most expensive 1st',
-        descLabel: 'least expensive 1st',
+        ascLabel: 'lest expensive 1st',
+        descLabel: 'most expensive 1st',
       }
     case 'count_on_hand':
       return {
-        ascLabel: 'most quantity first',
-        descLabel: 'least quantity first',
+        ascLabel: 'lest quantity first',
+        descLabel: 'most quantity first',
       }
     default:
       return { ascLabel: 'ascending', descLabel: 'descending' }
@@ -417,20 +439,40 @@ export default function ProductGrid() {
   const [showFilters, setShowFilters] = useState(false)
   const [selectedCatz, setSelectedCatz] = useState<string[]>([])
   const [selectedSubCatz, setSelectedSubCatz] = useState<string[]>([])
-  const [sortyBy, setSortBy] = useState<{
+  const [sortBy, setSortBy] = useState<{
     prop: string
     asc: boolean
     ascLabel: string
     descLabel: string
   }>({ prop: '', asc: true, ascLabel: '', descLabel: '' })
   const [showCodesFilter, setShowCodesFilter] = useState(false)
+  const [selectedCodes, setSelectedCodes] = useState<string[]>([])
+  const [inStockOnly, setInStockOnly] = useState(false)
+  const [allProducts, setAllProducts] = useState(false)
 
   const clickAwayRef = useRef<HTMLDivElement>(null)
   useClickAwayListener(clickAwayRef, () => setShowFilters(false))
 
   const { data: products, error } = useSWR(
-    { key: 'get_product', searchQ, selectedCatz, selectedSubCatz },
-    async ({ searchQ: q, selectedCatz: catz, selectedSubCatz: subcatz }) => {
+    {
+      key: 'get_product',
+      searchQ,
+      selectedCatz,
+      selectedSubCatz,
+      inStockOnly,
+      allProducts,
+      selectedCodes,
+      sortBy,
+    },
+    async ({
+      searchQ: q,
+      selectedCatz: catz,
+      selectedSubCatz: subcatz,
+      inStockOnly: inStock,
+      allProducts: everything,
+      selectedCodes: codes,
+      sortBy: sort,
+    }) => {
       let query = supabase.rpc('default_products', undefined, {
         count: 'exact',
       })
@@ -450,6 +492,25 @@ export default function ProductGrid() {
       if (subcatz && subcatz.length) {
         query = query.in('sub_category', subcatz)
       }
+
+      if (inStock) {
+        query = query.gte('count_on_hand', 0)
+      }
+
+      if (everything) {
+        // #TODO, figure out what prop to filter here
+      }
+
+      if (codes && codes.length) {
+        query = query.or(
+          codes.map((code) => `codes.ilike."%${code}%"`).join(',')
+        )
+      }
+
+      if (sort.prop) {
+        query = query.order(sort.prop, { ascending: sort.asc })
+      }
+
       const { data: products, error, count } = await query
 
       let cats: string[] = []
@@ -606,11 +667,19 @@ export default function ProductGrid() {
             )}
 
             <label className={styles.cat_label}>
-              <input type="checkbox" /> In stock only
+              <input
+                type="checkbox"
+                onChange={(e) => setInStockOnly(e.target.checked)}
+              />{' '}
+              In stock only
             </label>
 
             <label className={styles.cat_label}>
-              <input type="checkbox" /> All back catalog items
+              <input
+                type="checkbox"
+                onChange={(e) => setAllProducts(e.target.checked)}
+              />{' '}
+              All back catalog items
             </label>
 
             <label
@@ -619,7 +688,7 @@ export default function ProductGrid() {
             >
               Sort
               <select
-                value={sortyBy.prop}
+                value={sortBy.prop}
                 onChange={(e) => {
                   const { ascLabel, descLabel } = getLabelFor(e.target.value)
                   setSortBy((prev) => ({
@@ -631,10 +700,10 @@ export default function ProductGrid() {
                 }}
               >
                 <option></option>
-                <option value="price">Price</option>
+                <option value="u_price">Price</option>
                 <option value="count_on_hand">Count On Hand</option>
               </select>
-              {sortyBy.prop && (
+              {sortBy.prop && (
                 <button
                   onClick={() => {
                     setSortBy((prev) => ({
@@ -643,7 +712,7 @@ export default function ProductGrid() {
                     }))
                   }}
                 >
-                  {sortyBy.asc ? sortyBy.ascLabel : sortyBy.descLabel}
+                  {sortBy.asc ? sortBy.ascLabel : sortBy.descLabel}
                 </button>
               )}
             </label>
@@ -656,7 +725,9 @@ export default function ProductGrid() {
               Product codes
             </label>
             {showCodesFilter && (
-              <div className={styles.codes}>{renderAllCodes()}</div>
+              <div className={styles.codes}>
+                {renderAllCodes(selectedCodes, setSelectedCodes)}
+              </div>
             )}
 
             <ShoppingList searchQ={searchQ} setSearchQ={setSearchQ} />
