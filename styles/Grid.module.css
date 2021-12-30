@@ -78,10 +78,11 @@
 .search_container label.cat_label {
   border-radius: 0px;
   border: none;
-  margin: 0px;
+  margin: 4px 0 0 0;
   background-color: plum;
   text-align: left;
   width: 99%;
+  text-transform: uppercase;
 }
 
 .filters > select {
@@ -92,7 +93,8 @@
 }
 
 .filters .filter_reset {
-  margin: 6px 0;
+  margin: 6px 0 0 0;
+  text-align: right;
 }
 
 .filters .filter_reset button,
@@ -109,6 +111,7 @@
   text-align: right;
   max-height: 40vh;
   overflow-y: scroll;
+  /* border-top: 1px solid black; */
 }
 .filters .shopping_list .shopping_list_title {
   position: sticky;
@@ -117,7 +120,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-left: 30px;
 }
 
 .filters .shopping_list input {
@@ -195,12 +197,30 @@
   font-size: 2rem;
   display: inline-block;
   margin-block: 0.6rem;
+  word-break: keep-all;
 }
 
 .card p {
   margin: 0;
   font-size: 1.25rem;
   line-height: 1.1;
+}
+
+.card .codes {
+  margin-top: 3px;
+  font-size: 0.7rem;
+  word-break: keep-all;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3px;
+  grid-auto-rows: minmax(30px, auto);
+}
+.card .code {
+  padding: 1px 1px 3px 1px;
+  border: thin solid black;
+  border-width: 1px 2px 4px 2px;
+  border-radius: 4px;
+  text-align: center;
 }
 
 .card > .cardSelected {

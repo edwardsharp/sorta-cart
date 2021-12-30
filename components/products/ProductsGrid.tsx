@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { string } from 'square/dist/schema'
 import useSWR from 'swr'
 
 import {
@@ -107,7 +106,7 @@ function useLocalStorage<T>(key: string, initialValue: T) {
       return item ? JSON.parse(item) : initialValue
     } catch (error) {
       // If error also return initialValue
-      console.log(error)
+      console.warn(error)
       return initialValue
     }
   })
@@ -124,10 +123,72 @@ function useLocalStorage<T>(key: string, initialValue: T) {
       window.localStorage.setItem(key, JSON.stringify(valueToStore))
     } catch (error) {
       // A more advanced implementation would handle the error case
-      console.log(error)
+      console.warn(error)
     }
   }
   return [storedValue, setValue] as const
+}
+
+const PROPERTY_MAP: { [index: string]: string } = {
+  a: 'Artificial ingredients',
+  c: 'Low carb',
+  d: 'Dairy free',
+  f: 'Food Service items',
+  g: 'Gluten free',
+  k: 'Kosher',
+  l: 'Low sodium / no salt',
+  m: 'Non-GMO Project Verified',
+  og: 'Organic',
+  r: 'Refined sugar',
+  v: 'Vegan',
+  w: 'Wheat free',
+  ft: 'Fair Trade',
+  n: 'Natural',
+  s: 'Specialty Only',
+  y: 'Yeast free',
+  1: '100% organic',
+  2: '95%+ organic',
+  3: '70%+ organic',
+}
+
+function renderCodes(codes?: string) {
+  if (!codes) {
+    return ''
+  }
+  return codes.split(', ').map((code, idx) =>
+    PROPERTY_MAP[code] ? (
+      <span className={styles.code} key={`pprop${idx}`}>
+        {PROPERTY_MAP[code]}
+      </span>
+    ) : (
+      ''
+    )
+  )
+}
+
+function renderAllCodes() {
+  return Object.values(PROPERTY_MAP).map((code, idx) => (
+    <button className={styles.code} key={`allcodez${idx}`}>
+      {code}
+    </button>
+  ))
+}
+
+function getLabelFor(prop: string): { ascLabel: string; descLabel: string } {
+  switch (prop) {
+    case 'price':
+      return {
+        ascLabel: 'most expensive 1st',
+        descLabel: 'least expensive 1st',
+      }
+    case 'count_on_hand':
+      return {
+        ascLabel: 'most quantity first',
+        descLabel: 'least quantity first',
+      }
+    default:
+      return { ascLabel: 'ascending', descLabel: 'descending' }
+  }
 }
 
 const ProductCard = (props: {
@@ -190,12 +251,20 @@ const ProductCard = (props: {
           <div onClick={() => incrementCount('+')}>+</div>
         </div>
       )}
+      <div>
+        <small>{product.name}</small>
+      </div>
       <p>{product.description}</p>
       <div>{formatPrice(product)}</div>
       <div>
-        <small>{product.name}</small>
+        <small>
+          {product.count_on_hand && product.count_on_hand > 0
+            ? `${product.count_on_hand} in stock`
+            : ''}
+        </small>
         <b style={{ marginLeft: 6 }}>{count > 0 && `${count} in cart`}</b>
       </div>
+      <div className={styles.codes}>{renderCodes(product.codes)}</div>
     </div>
   )
 }
@@ -261,28 +330,30 @@ const ShoppingList = (props: {
   setSearchQ: React.Dispatch<React.SetStateAction<string>>
 }) => {
   const { searchQ, setSearchQ } = props
-  // const [shoppingList, setShoppingList] = useState<
-  //   Array<{ item: string; done: boolean }>
-  // >([])
 
   const [shoppingList, setShoppingList] = useLocalStorage<ShoppingListItem[]>(
     'shoppingList',
     []
   )
 
-  const onItemChange = (idx: number, item: string) => {
+  function onItemChange(idx: number, item: string) {
     setShoppingList((prev) =>
       prev.map((o, i) => (i === idx ? { item, done: o.done } : o))
     )
   }
-  const onDoneChange = (idx: number, done: boolean) => {
+  function onDoneChange(idx: number, done: boolean) {
     setShoppingList((prev) =>
       prev.map((o, i) => (i === idx ? { item: o.item, done } : o))
     )
   }
 
-  const deleteItem = (idx: number) => {
+  function deleteItem(idx: number) {
     setShoppingList((prev) => prev.filter((o, i) => i !== idx))
+  }
+
+  function addNewItem() {
+    const item = shoppingList.some((o) => o.item === searchQ) ? '' : searchQ
+    setShoppingList((prev) => [{ item, done: false }, ...prev])
   }
 
   return (
@@ -290,9 +361,7 @@ const ShoppingList = (props: {
       <div className={styles.shopping_list_title}>
         <span>Shopping list</span>
         <button
-          onClick={() => {
-            setShoppingList((prev) => [{ item: '', done: false }, ...prev])
-          }}
+          onClick={addNewItem}
           className={styles.add_to_list}
           title="add a new item to the shopping list"
         >
@@ -348,6 +417,13 @@ export default function ProductGrid() {
   const [showFilters, setShowFilters] = useState(false)
   const [selectedCatz, setSelectedCatz] = useState<string[]>([])
   const [selectedSubCatz, setSelectedSubCatz] = useState<string[]>([])
+  const [sortyBy, setSortBy] = useState<{
+    prop: string
+    asc: boolean
+    ascLabel: string
+    descLabel: string
+  }>({ prop: '', asc: true, ascLabel: '', descLabel: '' })
+  const [showCodesFilter, setShowCodesFilter] = useState(false)
 
   const clickAwayRef = useRef<HTMLDivElement>(null)
   useClickAwayListener(clickAwayRef, () => setShowFilters(false))
@@ -491,7 +567,7 @@ export default function ProductGrid() {
             {sub_categories && sub_categories.length > 0 && (
               <>
                 <label className={styles.cat_label}>
-                  Sub Category ({sub_categories?.length || 0})
+                  Sub category ({sub_categories?.length || 0})
                 </label>
                 <select
                   name="sub-cat-select"
@@ -514,6 +590,7 @@ export default function ProductGrid() {
                 </select>
               </>
             )}
+
             {catzCount > 0 && (
               <div className={styles.filter_reset}>
                 <button
@@ -526,6 +603,60 @@ export default function ProductGrid() {
                   reset categories
                 </button>
               </div>
+            )}
+
+            <label className={styles.cat_label}>
+              <input type="checkbox" /> In stock only
+            </label>
+
+            <label className={styles.cat_label}>
+              <input type="checkbox" /> All back catalog items
+            </label>
+
+            <label
+              className={styles.cat_label}
+              style={{ display: 'flex', alignItems: 'center' }}
+            >
+              Sort
+              <select
+                value={sortyBy.prop}
+                onChange={(e) => {
+                  const { ascLabel, descLabel } = getLabelFor(e.target.value)
+                  setSortBy((prev) => ({
+                    ...prev,
+                    prop: e.target.value,
+                    ascLabel,
+                    descLabel,
+                  }))
+                }}
+              >
+                <option></option>
+                <option value="price">Price</option>
+                <option value="count_on_hand">Count On Hand</option>
+              </select>
+              {sortyBy.prop && (
+                <button
+                  onClick={() => {
+                    setSortBy((prev) => ({
+                      ...prev,
+                      asc: !prev.asc,
+                    }))
+                  }}
+                >
+                  {sortyBy.asc ? sortyBy.ascLabel : sortyBy.descLabel}
+                </button>
+              )}
+            </label>
+
+            <label className={styles.cat_label}>
+              <input
+                type="checkbox"
+                onChange={(e) => setShowCodesFilter(e.target.checked)}
+              />{' '}
+              Product codes
+            </label>
+            {showCodesFilter && (
+              <div className={styles.codes}>{renderAllCodes()}</div>
             )}
 
             <ShoppingList searchQ={searchQ} setSearchQ={setSearchQ} />
