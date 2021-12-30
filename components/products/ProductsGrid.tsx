@@ -299,7 +299,7 @@ const ShoppingList = (props: {
           +
         </button>
       </div>
-      {shoppingList.reverse().map((o, idx) => (
+      {shoppingList.map((o, idx) => (
         <div className={styles.shopping_list_items} key={`shoplist${idx}`}>
           <input
             type="checkbox"
