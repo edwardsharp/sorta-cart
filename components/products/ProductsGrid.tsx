@@ -426,7 +426,7 @@ export default function ProductGrid() {
       return 'l o a d i n g . . .'
     }
 
-    const count = `${products.count} products`
+    const count = `${products.count} product${products.count > 1 ? 's' : ''}`
 
     if (catzCount === 1) {
       return `${count} in ${catzCount} category.`
