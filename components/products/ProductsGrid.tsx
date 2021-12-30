@@ -294,7 +294,7 @@ const ShoppingList = (props: {
             setShoppingList((prev) => [{ item: '', done: false }, ...prev])
           }}
           className={styles.add_to_list}
-          title="Add a new item to the shopping list"
+          title="add a new item to the shopping list"
         >
           +
         </button>
@@ -305,11 +305,16 @@ const ShoppingList = (props: {
             type="checkbox"
             checked={o.done}
             onChange={(ev) => onDoneChange(idx, ev.target.checked)}
+            title={`mark as ${o.done ? 'not ' : ''}done`}
           />
           {o.done ? (
             <>
               <span className={styles.done}>{o.item}</span>
-              <button className={styles.item} onClick={() => deleteItem(idx)}>
+              <button
+                className={styles.item}
+                onClick={() => deleteItem(idx)}
+                title="remove from list"
+              >
                 x
               </button>
             </>
@@ -325,6 +330,8 @@ const ShoppingList = (props: {
               <button
                 className={styles.item}
                 onClick={() => setSearchQ(o.item)}
+                title={o.item ? `search for ${o.item}` : ''}
+                disabled={!o.item}
               >
                 search
               </button>
@@ -412,6 +419,25 @@ export default function ProductGrid() {
     }
   )
 
+  const catzCount = selectedCatz.length + selectedSubCatz.length
+
+  const getSearchLabel = () => {
+    if (!products) {
+      return 'l o a d i n g . . .'
+    }
+
+    const count = `${products.count} products`
+
+    if (catzCount === 1) {
+      return `${count} in ${catzCount} category.`
+    }
+    if (catzCount > 1) {
+      return `${count} in ${catzCount} categories.`
+    }
+
+    return count
+  }
+
   return (
     <>
       <div className={styles.search_container}>
@@ -426,7 +452,7 @@ export default function ProductGrid() {
               onChange={(e) => setSearchQ(e.target.value)}
             />
 
-            {products ? `${products.count} products` : 'l o a d i n g . . .'}
+            {getSearchLabel()}
           </label>
 
           {!showFilters && (
@@ -488,16 +514,19 @@ export default function ProductGrid() {
                 </select>
               </>
             )}
-            <div className={styles.filter_reset}>
-              <button
-                onClick={() => {
-                  setSelectedCatz([])
-                  setSelectedSubCatz([])
-                }}
-              >
-                reset
-              </button>
-            </div>
+            {catzCount > 0 && (
+              <div className={styles.filter_reset}>
+                <button
+                  onClick={() => {
+                    setSelectedCatz([])
+                    setSelectedSubCatz([])
+                  }}
+                  title="clear all selected categories"
+                >
+                  reset categories
+                </button>
+              </div>
+            )}
 
             <ShoppingList searchQ={searchQ} setSearchQ={setSearchQ} />
           </div>
