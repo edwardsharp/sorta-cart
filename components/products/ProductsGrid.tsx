@@ -200,12 +200,12 @@ function getLabelFor(prop: string): { ascLabel: string; descLabel: string } {
   switch (prop) {
     case 'u_price':
       return {
-        ascLabel: 'lest expensive 1st',
-        descLabel: 'most expensive 1st',
+        ascLabel: 'least expensive first',
+        descLabel: 'most expensive first',
       }
     case 'count_on_hand':
       return {
-        ascLabel: 'lest quantity first',
+        ascLabel: 'least quantity first',
         descLabel: 'most quantity first',
       }
     default:
@@ -686,12 +686,11 @@ export default function ProductGrid() {
               All back catalog items
             </label>
 
-            <label
-              className={styles.cat_label}
-              style={{ display: 'flex', alignItems: 'center' }}
-            >
-              Sort
+            <label className={styles.cat_label}>Sort</label>
+
+            <div style={{ display: 'flex', alignItems: 'center' }}>
               <select
+                style={{ flexGrow: 1 }}
                 value={sortBy.prop}
                 onChange={(e) => {
                   const { ascLabel, descLabel } = getLabelFor(e.target.value)
@@ -719,7 +718,7 @@ export default function ProductGrid() {
                   {sortBy.asc ? sortBy.ascLabel : sortBy.descLabel}
                 </button>
               )}
-            </label>
+            </div>
 
             <label className={styles.cat_label}>
               <input
