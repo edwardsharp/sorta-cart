@@ -434,6 +434,8 @@ const ShoppingList = (props: {
   )
 }
 
+const DEFAULT_SORT_BY = { prop: '', asc: true, ascLabel: '', descLabel: '' }
+
 export default function ProductGrid() {
   const [searchQ, setSearchQ] = useState('')
   const [showFilters, setShowFilters] = useState(false)
@@ -444,7 +446,7 @@ export default function ProductGrid() {
     asc: boolean
     ascLabel: string
     descLabel: string
-  }>({ prop: '', asc: true, ascLabel: '', descLabel: '' })
+  }>(DEFAULT_SORT_BY)
   const [showCodesFilter, setShowCodesFilter] = useState(false)
   const [selectedCodes, setSelectedCodes] = useState<string[]>([])
   const [inStockOnly, setInStockOnly] = useState(false)
@@ -669,6 +671,7 @@ export default function ProductGrid() {
             <label className={styles.cat_label}>
               <input
                 type="checkbox"
+                checked={inStockOnly}
                 onChange={(e) => setInStockOnly(e.target.checked)}
               />{' '}
               In stock only
@@ -677,6 +680,7 @@ export default function ProductGrid() {
             <label className={styles.cat_label}>
               <input
                 type="checkbox"
+                checked={allProducts}
                 onChange={(e) => setAllProducts(e.target.checked)}
               />{' '}
               All back catalog items
@@ -720,7 +724,14 @@ export default function ProductGrid() {
             <label className={styles.cat_label}>
               <input
                 type="checkbox"
-                onChange={(e) => setShowCodesFilter(e.target.checked)}
+                checked={showCodesFilter}
+                onChange={(e) => {
+                  setShowCodesFilter(e.target.checked)
+                  if (!e.target.checked) {
+                    // clear filter on un-check
+                    setSelectedCodes([])
+                  }
+                }}
               />{' '}
               Product codes
             </label>
@@ -729,6 +740,23 @@ export default function ProductGrid() {
                 {renderAllCodes(selectedCodes, setSelectedCodes)}
               </div>
             )}
+
+            <div className={styles.filter_reset}>
+              <button
+                onClick={() => {
+                  setSelectedCatz([])
+                  setSelectedSubCatz([])
+                  setInStockOnly(false)
+                  setAllProducts(false)
+                  setSortBy(DEFAULT_SORT_BY)
+                  setShowCodesFilter(false)
+                  setSelectedCodes([])
+                }}
+                title="clear all filters"
+              >
+                clear all filters
+              </button>
+            </div>
 
             <ShoppingList searchQ={searchQ} setSearchQ={setSearchQ} />
           </div>
