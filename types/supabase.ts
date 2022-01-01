@@ -540,6 +540,96 @@ export interface paths {
       };
     };
   };
+  "/catmap": {
+    get: {
+      parameters: {
+        query: {
+          from?: parameters["rowFilter.catmap.from"];
+          to?: parameters["rowFilter.catmap.to"];
+          /** Filtering Columns */
+          select?: parameters["select"];
+          /** Ordering */
+          order?: parameters["order"];
+          /** Limiting and Pagination */
+          offset?: parameters["offset"];
+          /** Limiting and Pagination */
+          limit?: parameters["limit"];
+        };
+        header: {
+          /** Limiting and Pagination */
+          Range?: parameters["range"];
+          /** Limiting and Pagination */
+          "Range-Unit"?: parameters["rangeUnit"];
+          /** Preference */
+          Prefer?: parameters["preferCount"];
+        };
+      };
+      responses: {
+        /** OK */
+        200: {
+          schema: definitions["catmap"][];
+        };
+        /** Partial Content */
+        206: unknown;
+      };
+    };
+    post: {
+      parameters: {
+        body: {
+          /** catmap */
+          catmap?: definitions["catmap"];
+        };
+        query: {
+          /** Filtering Columns */
+          select?: parameters["select"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** Created */
+        201: unknown;
+      };
+    };
+    delete: {
+      parameters: {
+        query: {
+          from?: parameters["rowFilter.catmap.from"];
+          to?: parameters["rowFilter.catmap.to"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** No Content */
+        204: never;
+      };
+    };
+    patch: {
+      parameters: {
+        query: {
+          from?: parameters["rowFilter.catmap.from"];
+          to?: parameters["rowFilter.catmap.to"];
+        };
+        body: {
+          /** catmap */
+          catmap?: definitions["catmap"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** No Content */
+        204: never;
+      };
+    };
+  };
   "/products": {
     get: {
       parameters: {
@@ -570,6 +660,7 @@ export interface paths {
           /** hand-edited description, intended to persist after upsert */
           description_edit?: parameters["rowFilter.products.description_edit"];
           description?: parameters["rowFilter.products.description"];
+          featured?: parameters["rowFilter.products.featured"];
           /** Filtering Columns */
           select?: parameters["select"];
           /** Ordering */
@@ -646,6 +737,7 @@ export interface paths {
           /** hand-edited description, intended to persist after upsert */
           description_edit?: parameters["rowFilter.products.description_edit"];
           description?: parameters["rowFilter.products.description"];
+          featured?: parameters["rowFilter.products.featured"];
         };
         header: {
           /** Preference */
@@ -686,6 +778,7 @@ export interface paths {
           /** hand-edited description, intended to persist after upsert */
           description_edit?: parameters["rowFilter.products.description_edit"];
           description?: parameters["rowFilter.products.description"];
+          featured?: parameters["rowFilter.products.featured"];
         };
         body: {
           /** products */
@@ -1136,6 +1229,17 @@ export interface definitions {
      */
     api_key: string;
   };
+  /** @description product category and sub_category mappings */
+  catmap: {
+    /**
+     * Format: text
+     * @description Note:
+     * This is a Primary Key.<pk/>
+     */
+    from: string;
+    /** Format: text */
+    to: string;
+  };
   products: {
     /** Format: text */
     unf?: string;
@@ -1204,6 +1308,8 @@ export interface definitions {
      * @default COALESCE(description_edit, description_orig)
      */
     description?: string;
+    /** Format: boolean */
+    featured?: boolean;
   };
   /** @description square on-hand inventory */
   stock: {
@@ -1396,6 +1502,12 @@ export interface parameters {
   "rowFilter.WholesaleOrders.data": string;
   /** Format: uuid */
   "rowFilter.WholesaleOrders.api_key": string;
+  /** @description catmap */
+  "body.catmap": definitions["catmap"];
+  /** Format: text */
+  "rowFilter.catmap.from": string;
+  /** Format: text */
+  "rowFilter.catmap.to": string;
   /** @description products */
   "body.products": definitions["products"];
   /** Format: text */
@@ -1452,6 +1564,8 @@ export interface parameters {
   "rowFilter.products.description_edit": string;
   /** Format: text */
   "rowFilter.products.description": string;
+  /** Format: boolean */
+  "rowFilter.products.featured": string;
   /** @description stock */
   "body.stock": definitions["stock"];
   /** Format: text */
