@@ -7,26 +7,31 @@ if (process.env.NODE_ENV !== 'production') {
   dotenv.config({ path: path.resolve(process.cwd(), '.env.local') })
 }
 
-import { getProductsInStock, mapProductsToStock } from '../../services/square'
+import {
+  getProductsInStock,
+  mapSqCatalogToProducts,
+} from '../../services/square'
 import { getSupabaseServiceRoleClient } from '../../services/supabase/supabase'
 import { upsertStock } from '../../services/supabase/stock'
+import { upsertProducts } from '../../services/supabase/products'
 
 const main = async () => {
   console.log('gonna fetch stock from square, this might take a while...')
-  const products = await getProductsInStock()
-  const stock = mapProductsToStock(products)
+  const catalog = await getProductsInStock()
+  const products = await mapSqCatalogToProducts(catalog)
 
-  console.log('square getProductsInStock() length:', products.length)
+  console.log('square getProductsInStock() length:', catalog.length)
 
-  if (stock.length) {
+  if (products.length) {
     console.log(
-      `gonna try to upsert ${stock.length} stock items to supabase...`
+      `gonna try to upsert ${products.length} stock items to supabase...`
     )
     const client = getSupabaseServiceRoleClient()
-    await upsertStock({ client, stock })
+    await upsertProducts({ client, products })
+    // await upsertStock({ client, products })
   }
 
-  if (!products.length) {
+  if (!catalog.length) {
     console.warn('no stock found!')
   }
 

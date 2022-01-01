@@ -309,6 +309,104 @@ export function mapProductsToStock(
   })
 }
 
+function getIdFromCAVorSKU(
+  cav: CustomAttributeValues | null,
+  sku?: string
+): string {
+  if (cav?.id) {
+    return `${cav.id}`
+  }
+  if (cav?.unf && cav?.upc_code) {
+    return `${cav.unf}__${`${cav.upc_code}`.replace(/-/g, '')}`
+  }
+  if (sku) {
+    return `__${sku}`
+  }
+  return '' // eek :/
+}
+
+function parseNameAndDesc(item: CatalogObjectWithQty): {
+  name?: string
+  description_orig?: string
+} {
+  if (item.itemData?.name && item.itemData.name.includes('--')) {
+    const [name, description] = item.itemData.name.split('--')
+    return { name: name.trim(), description_orig: description.trim() }
+  }
+  const name = item.itemData?.name
+  const description = item.itemData?.description
+  if (!description || !isNaN(parseInt(description))) {
+    // so if there's no description, or the description is numbers, then return the name as description.
+    return { name: undefined, description_orig: name }
+  }
+  return { name, description_orig: description }
+}
+
+async function parseCategory(item: CatalogObjectWithQty): Promise<{
+  category?: string
+  sub_category?: string
+}> {
+  if (item.itemData?.categoryId) {
+    console.log('zomg have categoryId')
+    const res = await catalogApi.retrieveCatalogObject(item.itemData.categoryId)
+    if (res.result.object?.categoryData?.name) {
+      const cat = res.result.object?.categoryData?.name
+      if (cat.includes('>')) {
+        const [category, sub_category] = cat.split('>')
+        return {
+          category: category.trim(),
+          sub_category: sub_category.trim(),
+        }
+      }
+      return { category: cat }
+    } else {
+      return { category: undefined, sub_category: undefined }
+    }
+  }
+
+  return { category: undefined, sub_category: undefined }
+}
+
+export async function mapSqCatalogToProducts(
+  catalog: CatalogObjectWithQty[]
+): Promise<Product[]> {
+  const catalogMap = catalog.map(async (item) => {
+    const priceMaybeBigInt =
+      (item.itemData &&
+        item.itemData.variations &&
+        item.itemData?.variations[0].itemVariationData?.priceMoney?.amount) ||
+      0
+    const u_price = +(parseInt(`${priceMaybeBigInt}`) / 100).toFixed(2) // oh money numberz
+    const unit = `${item.standardUnitDescription?.name || 'Each'}`
+    const sku =
+      item.itemData?.variations &&
+      item.itemData.variations[0].itemVariationData?.sku
+    const item_id = item.id
+    const variation_id =
+      (item.itemData?.variations && item.itemData.variations[0].id) || ''
+
+    // customAttributeValues
+    const cav = mapCustomAttributes(item)
+    const id = getIdFromCAVorSKU(cav, sku)
+
+    const { category, sub_category } = await parseCategory(item)
+    return {
+      id,
+      ...parseNameAndDesc(item),
+      category,
+      sub_category,
+      u_price,
+      unit,
+      stock_on_hand: item.quantity,
+      upc_code: sku,
+      // item_id,
+      // variation_id,
+      ...cav,
+    }
+  })
+  return Promise.all(catalogMap)
+}
+
 export async function batchRetrieveCatalogObjects(objectIds: string[]) {
   try {
     const { result } = await catalogApi.batchRetrieveCatalogObjects({

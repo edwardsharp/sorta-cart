@@ -1,17 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import {
-  addStandardUnitDescription,
-  batchRetrieveCatalogObjects,
-  batchRetrieveInventoryCounts,
   getProductsInStock,
-  mapProductsToStock,
+  mapSqCatalogToProducts,
   validateWebhookSignature,
 } from '../../../../services/square/square'
-import {
-  findStockItem,
-  updateStockQuantity,
-  upsertStock,
-} from '../../../../services/supabase/stock'
+import { upsertProducts } from '../../../../services/supabase/products'
+import { upsertStock } from '../../../../services/supabase/stock'
 import { getSupabaseServiceRoleClient } from '../../../../services/supabase/supabase'
 import { InventoryCountUpdatedWebhook } from '../../../../types/square'
 
@@ -79,20 +73,21 @@ async function updateStockLevels(
     return
   }
 
-  const products = await getProductsInStock(catalogObjectIds)
-  const stock = mapProductsToStock(products, false)
+  const catalog = await getProductsInStock(catalogObjectIds)
+  const products = await mapSqCatalogToProducts(catalog)
 
   //   console.log(
   //     'zomg  getProductsInStock() length (should be 1):',
   //     products.length
   //   )
 
-  if (stock.length) {
-    // console.log(
-    //   `gonna try to upsert ${stock.length} stock items to supabase...`,
-    //   stock
-    // )
+  if (products.length) {
+    console.log(
+      `gonna try to upsert ${products.length} stock items to supabase...`,
+      products
+    )
     const client = getSupabaseServiceRoleClient()
-    await upsertStock({ client, stock })
+    // await upsertStock({ client, stock })
+    await upsertProducts({ client, products })
   }
 }

@@ -1,3 +1,4 @@
+import { SupabaseClient } from '@supabase/supabase-js'
 import { definitions } from '../../types/supabase'
 import { supabase } from './supabase'
 
@@ -55,4 +56,37 @@ export async function getSubCategories(category: string) {
     acc[row.category] = row.category
     return acc
   }, {})
+}
+
+// all the functions below are known to need non-anon privileges, so client prop is passed in.
+// there might be a better way; this is sort of ad-hoc DI :internet-shrugz:
+export async function upsertProducts(props: {
+  products: Product | Product[]
+  client?: SupabaseClient
+}) {
+  const { client, products } = props
+  const c = client ? client : supabase
+
+  const { data, error } = await c.from('products').upsert(products)
+
+  //   if (error) throw new Error(error.message)
+  if (error) console.warn('upsertProducts caught error:', error.message)
+  return data
+}
+
+export async function updateProductCountOnHand(props: {
+  variation_id: string
+  count_on_hand: number
+  client?: SupabaseClient
+}) {
+  const { variation_id, count_on_hand, client } = props
+  const c = client ? client : supabase
+  const { data, error } = await c
+    .from<Product>('products')
+    .update({ count_on_hand })
+    .match({ variation_id })
+
+  //   if (error) throw new Error(error.message)
+  if (error) console.warn('updateProductCountOnHand caught error:', error)
+  return data
 }
