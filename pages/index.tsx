@@ -19,14 +19,16 @@ const Home: NextPage = () => {
         <h1 className={styles.title}>SORTA-CART</h1>
 
         <div className={styles.grid}>
-          <Link href="/products">
+          <Link href="/store">
             <a className={styles.card}>
-              <ProductsCard />
+              <h2>Store</h2>
+              <p>Browse product catalog, checkout with items in your cart.</p>
             </a>
           </Link>
-          <Link href="/stock">
+          <Link href="/admin">
             <a className={styles.card}>
-              <StockCard />
+              <h2>Admin</h2>
+              <p>Administration pages.</p>
             </a>
           </Link>
         </div>

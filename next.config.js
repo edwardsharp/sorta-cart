@@ -6,7 +6,10 @@ module.exports = {
       {
         source: '/admin/:path*',
         destination: '/admin/index.html', // Matched parameters can be used in the destination
-        // permanent: true,
+      },
+      {
+        source: '/store/:path*',
+        destination: '/store/index.html', // Matched parameters can be used in the destination
       },
     ]
   },
