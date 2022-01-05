@@ -4,8 +4,6 @@ import {
   CatalogCustomAttributeValue,
   CatalogObject,
   CatalogObjectBatch,
-  Client,
-  Environment,
   InventoryCount,
   StandardUnitDescription,
 } from 'square'
@@ -14,23 +12,17 @@ import crypto, { randomUUID } from 'crypto'
 
 import { Stock } from '../supabase/stock'
 import { Product } from '../supabase/products'
+import { client } from './client'
+import { getDefaultLocationId } from './locations'
 
 type CatalogObjectWithQty = CatalogObject & {
   quantity?: number
   standardUnitDescription?: StandardUnitDescription
 }
 
-const { SQUARE_ACCESS_TOKEN, SQUARE_SIGNATURE_KEY = '' } = process.env
+const { SQUARE_SIGNATURE_KEY = '' } = process.env
 
-export const client = new Client({
-  environment:
-    process.env.SQUARE_ENV === 'production'
-      ? Environment.Production
-      : Environment.Sandbox,
-  accessToken: SQUARE_ACCESS_TOKEN,
-})
-
-const { inventoryApi, catalogApi, locationsApi } = client
+const { inventoryApi, catalogApi } = client
 
 export async function batchRetrieveInventoryCounts(
   catalogObjectIds?: string[]
@@ -763,19 +755,7 @@ export async function addProductToCatalog(product: Product) {
 }
 
 export async function addInventory(variationId: string, qty: number) {
-  let locationId: string | undefined = undefined
-  if (!locationId) {
-    const {
-      result: { locations },
-    } = await locationsApi.listLocations()
-    if (locations && locations[0].id) {
-      locationId = locations[0].id
-    }
-  }
-  if (!locationId) {
-    console.log('zomg no location id gonna throw!')
-    throw new Error('onoz, error in addStock; no locationId found!')
-  }
+  const locationId = await getDefaultLocationId()
 
   const quantity = `${qty}`
 

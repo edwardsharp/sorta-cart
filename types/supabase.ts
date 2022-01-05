@@ -661,6 +661,7 @@ export interface paths {
           description_edit?: parameters["rowFilter.products.description_edit"];
           description?: parameters["rowFilter.products.description"];
           featured?: parameters["rowFilter.products.featured"];
+          sq_variation_id?: parameters["rowFilter.products.sq_variation_id"];
           /** Filtering Columns */
           select?: parameters["select"];
           /** Ordering */
@@ -738,6 +739,7 @@ export interface paths {
           description_edit?: parameters["rowFilter.products.description_edit"];
           description?: parameters["rowFilter.products.description"];
           featured?: parameters["rowFilter.products.featured"];
+          sq_variation_id?: parameters["rowFilter.products.sq_variation_id"];
         };
         header: {
           /** Preference */
@@ -779,6 +781,7 @@ export interface paths {
           description_edit?: parameters["rowFilter.products.description_edit"];
           description?: parameters["rowFilter.products.description"];
           featured?: parameters["rowFilter.products.featured"];
+          sq_variation_id?: parameters["rowFilter.products.sq_variation_id"];
         };
         body: {
           /** products */
@@ -1310,6 +1313,8 @@ export interface definitions {
     description?: string;
     /** Format: boolean */
     featured?: boolean;
+    /** Format: text */
+    sq_variation_id?: string;
   };
   /** @description square on-hand inventory */
   stock: {
@@ -1566,6 +1571,8 @@ export interface parameters {
   "rowFilter.products.description": string;
   /** Format: boolean */
   "rowFilter.products.featured": string;
+  /** Format: text */
+  "rowFilter.products.sq_variation_id": string;
   /** @description stock */
   "body.stock": definitions["stock"];
   /** Format: text */

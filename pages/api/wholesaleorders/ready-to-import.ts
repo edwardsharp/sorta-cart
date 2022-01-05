@@ -4,8 +4,7 @@ import { addInventory, addProductToCatalog } from '../../../services/square'
 import { Product } from '../../../services/supabase/products'
 import { getSupabaseServiceRoleClient } from '../../../services/supabase/supabase'
 import { definitions } from '../../../types/supabase'
-
-type LineItem = definitions['OrderLineItems']
+import { LineItem } from '../../../types/supatypes'
 
 interface GroupedItem {
   qtySum: number
