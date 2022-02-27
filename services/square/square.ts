@@ -10,7 +10,6 @@ import {
 import crypto, { randomUUID } from 'crypto'
 
 import { Product } from '../supabase/products'
-import { Stock } from '../supabase/stock'
 import { client } from './client'
 import { getDefaultLocationId } from './locations'
 import { isDeepStrictEqual } from 'util'
@@ -262,43 +261,6 @@ function mapCustomAttributes(product: CatalogObjectWithQty) {
     }
   }
   return null
-}
-
-export function mapProductsToStock(
-  products: CatalogObjectWithQty[],
-  includeCav: boolean = true
-): Stock[] {
-  return products.map((product) => {
-    const priceMaybeBigInt =
-      (product.itemData &&
-        product.itemData.variations &&
-        product.itemData?.variations[0].itemVariationData?.priceMoney
-          ?.amount) ||
-      0
-    const price = parseInt(`${priceMaybeBigInt}`) // oh typescript :/
-    const unit = `${product.standardUnitDescription?.name || 'Each'}`
-    const sku =
-      product.itemData?.variations &&
-      product.itemData.variations[0].itemVariationData?.sku
-    const item_id = product.id
-    const variation_id =
-      (product.itemData?.variations && product.itemData.variations[0].id) || ''
-
-    // customAttributeValues
-    const cav = includeCav ? mapCustomAttributes(product) : undefined
-
-    return {
-      name: product.itemData?.name,
-      description: product.itemData?.description,
-      price,
-      unit,
-      quantity: product.quantity,
-      sku,
-      item_id,
-      variation_id,
-      ...cav,
-    }
-  })
 }
 
 function getIdFromCAVorSKU(

@@ -1,4 +1,5 @@
-import { getProductsInStock, mapProductsToStock } from './square'
+import { getProductsInStock, mapSqCatalogToProducts } from './square'
+
 import fs from 'fs'
 import superjson from 'superjson'
 
@@ -7,16 +8,20 @@ jest.setTimeout(120000) // 2min
 
 describe('square', () => {
   test('getProductsInStock', async () => {
-    const products = await getProductsInStock()
-    const stock = mapProductsToStock(products)
+    const catalog = await getProductsInStock()
+    const products = await mapSqCatalogToProducts(catalog)
 
-    console.log('square getProductsInStock() length:', products.length)
+    console.log(
+      'square getProductsInStock() catalog, products length:',
+      catalog.length,
+      products.length
+    )
 
     if (products) {
-      fs.writeFileSync('products.json', superjson.stringify(products))
+      fs.writeFileSync('catalog.json', superjson.stringify(catalog))
 
-      fs.writeFileSync('stock.json', superjson.stringify(stock))
-      console.log('wrote file: products.json, stock.json.')
+      fs.writeFileSync('products.json', superjson.stringify(products))
+      console.log('wrote file: catalog.json, products.json.')
     } else {
       console.warn('no stock!')
     }

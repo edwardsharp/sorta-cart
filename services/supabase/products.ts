@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { definitions } from '../../types/supabase'
+import { logEvent } from './events'
 import { supabase } from './supabase'
 
 export type Product = definitions['products']
@@ -70,7 +71,13 @@ export async function upsertProducts(props: {
   const { data, error } = await c.from('products').upsert(products)
 
   //   if (error) throw new Error(error.message)
-  if (error) console.warn('upsertProducts caught error:', error.message)
+  if (error) {
+    logEvent({
+      tag: 'upsertProducts',
+      message: `upsertProducts caught error: ${error.message})`,
+      level: 'error',
+    })
+  }
   return data
 }
 
@@ -87,6 +94,12 @@ export async function updateProductCountOnHand(props: {
     .match({ variation_id })
 
   //   if (error) throw new Error(error.message)
-  if (error) console.warn('updateProductCountOnHand caught error:', error)
+  if (error) {
+    logEvent({
+      tag: 'updateProductCountOnHand',
+      message: `updateProductCountOnHand caught error: ${error.message})`,
+      level: 'error',
+    })
+  }
   return data
 }

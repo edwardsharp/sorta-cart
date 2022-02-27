@@ -9,7 +9,6 @@ import { InventoryCountUpdatedWebhook } from '../../../../types/square'
 import { getSupabaseServiceRoleClient } from '../../../../services/supabase/supabase'
 import { logEvent } from '../../../../services/supabase/events'
 import { upsertProducts } from '../../../../services/supabase/products'
-import { upsertStock } from '../../../../services/supabase/stock'
 
 type Data = {
   ok: boolean
@@ -36,7 +35,7 @@ export default async function handler(
   const signature = `${req.headers['x-square-signature']}`
 
   if (validateWebhookSignature({ reqBody, url, signature })) {
-    // process request and try to upsertStock
+    // process request and try to add stock
     // data > object > inventory_counts
     /*"catalog_object_id": "PQ45SJVXHXJHXWZQCN2RPHCY",
           "catalog_object_type": "ITEM_VARIATION",
@@ -64,14 +63,6 @@ async function updateStockLevels(
     return acc
   }, [] as string[])
 
-  //   console.log(
-  //     '[updateStockLevels] zomggg have ',
-  //     catalogObjectIds.length,
-  //     ' catalogObjectIds:',
-  //     catalogObjectIds,
-  //     ' got inventoryCountUpdatedWebhookData:',
-  //     inventoryCountUpdatedWebhookData
-  //   )
   if (catalogObjectIds.length === 0) {
     await logEvent({
       tag,
@@ -88,10 +79,11 @@ async function updateStockLevels(
   if (products.length) {
     await logEvent({
       tag,
-      message: `gonna try to upsert ${products.length} stock items to supabase...`,
+      message: `gonna try to upsert ${products.length} products (from catalogObjectIds.length: ${catalogObjectIds.length}) to supabase...`,
+      data: JSON.stringify({ products, inventoryCountUpdatedWebhookData }),
+      level: 'debug',
     })
     const client = getSupabaseServiceRoleClient()
-    // await upsertStock({ client, stock })
     await upsertProducts({ client, products })
   } else {
     await logEvent({
