@@ -1,19 +1,19 @@
 #!/usr/bin/env ts-node
 
+import {
+  getProductsInStock,
+  mapSqCatalogToProducts,
+} from '../../services/square'
+
 import dotenv from 'dotenv'
+import { getSupabaseServiceRoleClient } from '../../services/supabase/supabase'
 import path from 'path'
+import { upsertProducts } from '../../services/supabase/products'
 
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config({ path: path.resolve(process.cwd(), '.env.local') })
 }
 
-import {
-  getProductsInStock,
-  mapSqCatalogToProducts,
-} from '../../services/square'
-import { getSupabaseServiceRoleClient } from '../../services/supabase/supabase'
-import { upsertStock } from '../../services/supabase/stock'
-import { upsertProducts } from '../../services/supabase/products'
 
 const main = async () => {
   console.log('gonna fetch stock from square, this might take a while...')
@@ -28,7 +28,6 @@ const main = async () => {
     )
     const client = getSupabaseServiceRoleClient()
     await upsertProducts({ client, products })
-    // await upsertStock({ client, products })
   }
 
   if (!catalog.length) {
