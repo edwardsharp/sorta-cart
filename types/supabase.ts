@@ -633,6 +633,111 @@ export interface paths {
       };
     };
   };
+  "/events": {
+    get: {
+      parameters: {
+        query: {
+          id?: parameters["rowFilter.events.id"];
+          created_at?: parameters["rowFilter.events.created_at"];
+          level?: parameters["rowFilter.events.level"];
+          tag?: parameters["rowFilter.events.tag"];
+          message?: parameters["rowFilter.events.message"];
+          data?: parameters["rowFilter.events.data"];
+          env?: parameters["rowFilter.events.env"];
+          /** Filtering Columns */
+          select?: parameters["select"];
+          /** Ordering */
+          order?: parameters["order"];
+          /** Limiting and Pagination */
+          offset?: parameters["offset"];
+          /** Limiting and Pagination */
+          limit?: parameters["limit"];
+        };
+        header: {
+          /** Limiting and Pagination */
+          Range?: parameters["range"];
+          /** Limiting and Pagination */
+          "Range-Unit"?: parameters["rangeUnit"];
+          /** Preference */
+          Prefer?: parameters["preferCount"];
+        };
+      };
+      responses: {
+        /** OK */
+        200: {
+          schema: definitions["events"][];
+        };
+        /** Partial Content */
+        206: unknown;
+      };
+    };
+    post: {
+      parameters: {
+        body: {
+          /** events */
+          events?: definitions["events"];
+        };
+        query: {
+          /** Filtering Columns */
+          select?: parameters["select"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** Created */
+        201: unknown;
+      };
+    };
+    delete: {
+      parameters: {
+        query: {
+          id?: parameters["rowFilter.events.id"];
+          created_at?: parameters["rowFilter.events.created_at"];
+          level?: parameters["rowFilter.events.level"];
+          tag?: parameters["rowFilter.events.tag"];
+          message?: parameters["rowFilter.events.message"];
+          data?: parameters["rowFilter.events.data"];
+          env?: parameters["rowFilter.events.env"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** No Content */
+        204: never;
+      };
+    };
+    patch: {
+      parameters: {
+        query: {
+          id?: parameters["rowFilter.events.id"];
+          created_at?: parameters["rowFilter.events.created_at"];
+          level?: parameters["rowFilter.events.level"];
+          tag?: parameters["rowFilter.events.tag"];
+          message?: parameters["rowFilter.events.message"];
+          data?: parameters["rowFilter.events.data"];
+          env?: parameters["rowFilter.events.env"];
+        };
+        body: {
+          /** events */
+          events?: definitions["events"];
+        };
+        header: {
+          /** Preference */
+          Prefer?: parameters["preferReturn"];
+        };
+      };
+      responses: {
+        /** No Content */
+        204: never;
+      };
+    };
+  };
   "/products": {
     get: {
       parameters: {
@@ -1251,6 +1356,30 @@ export interface definitions {
     /** Format: text */
     to: string;
   };
+  /** @description event log */
+  events: {
+    /**
+     * Format: bigint
+     * @description Note:
+     * This is a Primary Key.<pk/>
+     */
+    id: number;
+    /**
+     * Format: timestamp with time zone
+     * @default now()
+     */
+    created_at?: string;
+    /** Format: text */
+    level?: string;
+    /** Format: text */
+    tag?: string;
+    /** Format: text */
+    message?: string;
+    /** Format: jsonb */
+    data?: string;
+    /** Format: text */
+    env?: string;
+  };
   products: {
     /** Format: text */
     unf?: string;
@@ -1523,6 +1652,22 @@ export interface parameters {
   "rowFilter.catmap.from": string;
   /** Format: text */
   "rowFilter.catmap.to": string;
+  /** @description events */
+  "body.events": definitions["events"];
+  /** Format: bigint */
+  "rowFilter.events.id": string;
+  /** Format: timestamp with time zone */
+  "rowFilter.events.created_at": string;
+  /** Format: text */
+  "rowFilter.events.level": string;
+  /** Format: text */
+  "rowFilter.events.tag": string;
+  /** Format: text */
+  "rowFilter.events.message": string;
+  /** Format: jsonb */
+  "rowFilter.events.data": string;
+  /** Format: text */
+  "rowFilter.events.env": string;
   /** @description products */
   "body.products": definitions["products"];
   /** Format: text */

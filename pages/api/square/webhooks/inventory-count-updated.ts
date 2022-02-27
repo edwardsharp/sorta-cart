@@ -4,26 +4,32 @@ import {
   mapSqCatalogToProducts,
   validateWebhookSignature,
 } from '../../../../services/square/square'
+
+import { InventoryCountUpdatedWebhook } from '../../../../types/square'
+import { getSupabaseServiceRoleClient } from '../../../../services/supabase/supabase'
+import { logEvent } from '../../../../services/supabase/events'
 import { upsertProducts } from '../../../../services/supabase/products'
 import { upsertStock } from '../../../../services/supabase/stock'
-import { getSupabaseServiceRoleClient } from '../../../../services/supabase/supabase'
-import { InventoryCountUpdatedWebhook } from '../../../../types/square'
 
 type Data = {
   ok: boolean
 }
+
+const tag = '/api/square/webhooks/inventory-count-updated'
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  console.log(
-    '[/api/square/webhooks/inventory-count-updated] req.headers:',
-    req.headers,
-    'req.url',
-    req.url,
-    'req.body:',
-    req.body
-  )
+  await logEvent({
+    tag,
+    message: 'handler',
+    data: JSON.stringify({
+      headers: req.headers,
+      url: req.url,
+      body: req.body,
+    }),
+  })
 
   const reqBody = JSON.stringify(req.body)
   const url = `https://${req.headers.host}${req.url}`
@@ -67,27 +73,31 @@ async function updateStockLevels(
   //     inventoryCountUpdatedWebhookData
   //   )
   if (catalogObjectIds.length === 0) {
-    // console.log(
-    //   'updateStockLevels catalogObjectIds empty (i guess no ITEM_VARIATION types??), returning...'
-    // )
+    await logEvent({
+      tag,
+      message:
+        'updateStockLevels catalogObjectIds empty (i guess no ITEM_VARIATION types??), returning...',
+      level: 'warn',
+    })
     return
   }
 
   const catalog = await getProductsInStock(catalogObjectIds)
   const products = await mapSqCatalogToProducts(catalog)
 
-  //   console.log(
-  //     'zomg  getProductsInStock() length (should be 1):',
-  //     products.length
-  //   )
-
   if (products.length) {
-    console.log(
-      `gonna try to upsert ${products.length} stock items to supabase...`,
-      products
-    )
+    await logEvent({
+      tag,
+      message: `gonna try to upsert ${products.length} stock items to supabase...`,
+    })
     const client = getSupabaseServiceRoleClient()
     // await upsertStock({ client, stock })
     await upsertProducts({ client, products })
+  } else {
+    await logEvent({
+      tag,
+      message: 'getProductsInStock() length is not 1!',
+      level: 'warn',
+    })
   }
 }
