@@ -7,13 +7,13 @@ import {
   InventoryCount,
   StandardUnitDescription,
 } from 'square'
-import { isDeepStrictEqual } from 'util'
 import crypto, { randomUUID } from 'crypto'
 
-import { Stock } from '../supabase/stock'
 import { Product } from '../supabase/products'
+import { Stock } from '../supabase/stock'
 import { client } from './client'
 import { getDefaultLocationId } from './locations'
+import { isDeepStrictEqual } from 'util'
 
 type CatalogObjectWithQty = CatalogObject & {
   quantity?: number
@@ -373,7 +373,6 @@ export async function mapSqCatalogToProducts(
     const sku =
       item.itemData?.variations &&
       item.itemData.variations[0].itemVariationData?.sku
-    const item_id = item.id
     const variation_id =
       (item.itemData?.variations && item.itemData.variations[0].id) || ''
 
@@ -391,8 +390,7 @@ export async function mapSqCatalogToProducts(
       unit,
       stock_on_hand: item.quantity,
       upc_code: sku,
-      // item_id,
-      // variation_id,
+      sq_variation_id: variation_id,
       ...cav,
     }
   })

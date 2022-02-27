@@ -74,7 +74,7 @@ const main = async () => {
     // count_on_hand: null,
     no_backorder: false,
     // plu: null,
-    id: '68851__0-93966-30754-2__',
+    id: '68851__0-93966-30754-2',
     description_orig:
       'Turkey, Ground, Extra Lean, Gluten-Free, Frozen, Organic Prairie',
     // description_edit: null,
