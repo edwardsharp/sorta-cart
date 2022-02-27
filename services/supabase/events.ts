@@ -20,12 +20,13 @@ const DEFAULT_EVENT: Event = {
 export async function logEvent(event: LogEvent) {
   const e = {
     ...DEFAULT_EVENT,
-    event,
+    ...event,
   }
   const { error } = await supabase
     .from<Event>('events')
     .insert(e, { returning: 'minimal' })
 
+  if (error) console.warn('logEvent caught error:', error)
   return error
 }
 

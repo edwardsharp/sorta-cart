@@ -12,11 +12,11 @@ const APP_VERSION = `v${
   process.env.npm_package_version || require('../../package.json').version
 }`
 
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  logEvent({
+  await logEvent({
     tag: 'api/hello',
     message: 'hello world!',
     data: JSON.stringify({ headers: req.headers }),
