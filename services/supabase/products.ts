@@ -68,7 +68,7 @@ export async function upsertProducts(props: {
   const { client, products } = props
   const c = client ? client : supabase
 
-  const { data, error } = await c.from('products').upsert(products)
+  const { data, error, count } = await c.from('products').upsert(products)
 
   //   if (error) throw new Error(error.message)
   if (error) {
@@ -78,6 +78,12 @@ export async function upsertProducts(props: {
       level: 'error',
     })
   }
+  logEvent({
+    tag: 'upsertProducts',
+    message: `upsertProducts result count: ${count})`,
+    level: 'debug',
+    data: JSON.stringify({ data, error, count }),
+  })
   return data
 }
 
