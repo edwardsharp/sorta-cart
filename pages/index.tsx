@@ -1,9 +1,6 @@
-import type { NextPage } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
-import ProductsCard from '../components/products/ProductsCard'
-import StockCard from '../components/stock/StockCard'
-
+import type { NextPage } from 'next'
 import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => {
