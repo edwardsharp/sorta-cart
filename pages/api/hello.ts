@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
+import { logEvent } from '../../services/supabase/events'
+
 type Data = {
   SORTA: 'CART'
   APP_VERSION: string
@@ -14,5 +16,10 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
+  logEvent({
+    tag: 'api/hello',
+    message: 'hello world!',
+    data: JSON.stringify({ headers: req.headers }),
+  })
   res.status(200).json({ SORTA: 'CART', APP_VERSION, 'MADE WITH': '♥ in NYC' })
 }
