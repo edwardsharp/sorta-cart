@@ -350,7 +350,7 @@ export async function mapSqCatalogToProducts(
       sub_category,
       u_price,
       unit,
-      stock_on_hand: item.quantity,
+      count_on_hand: item.quantity,
       upc_code: sku,
       sq_variation_id: variation_id,
       ...cav,
