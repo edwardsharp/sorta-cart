@@ -1,13 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { defaultCorsMiddleware } from '../../../lib/cors-middleware'
 import { createOrder, mapLineItems } from '../../../services/square/orders'
-import { createPayment } from '../../../services/square/payments'
 import {
   getOrderForApiKey,
   updateOrderPayment,
 } from '../../../services/supabase/orders'
-import { getSupabaseServiceRoleClient } from '../../../services/supabase/supabase'
+
 import { LineItemWithProductData } from '../../../types/supatypes'
+import { createPayment } from '../../../services/square/payments'
+import { defaultCorsMiddleware } from '../../../lib/cors-middleware'
+import { getSupabaseServiceRoleClient } from '../../../services/supabase/supabase'
 
 type Data = {
   ok: boolean
@@ -66,10 +67,6 @@ async function handleNewOrderAndPayment(
   orderLineItems: LineItemWithProductData[],
   sourceId: string
 ): Promise<{ ok: boolean; data?: any }> {
-  // #TODO:
-  // hmm, should probably look up the order record in supabase via api_key prop.
-  // vs. passing the whole order into this thing. (which requires a lot of validation :/)
-
   const lineItems = mapLineItems(orderLineItems)
 
   const orderResponse = await createOrder({

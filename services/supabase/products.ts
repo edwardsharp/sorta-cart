@@ -68,13 +68,16 @@ export async function upsertProducts(props: {
   const { client, products } = props
   const c = client ? client : supabase
 
+  // #TODO: this should probably go thru each product and check if it already exists.
+  // and then only update a few props (like count_on_hand, updated_at, maybe price?)
+  // avoids ambigous changes like unit_type (which might be hard to determine from square data?)
+  // ...maybe? :hmm: need to think more about this.
   const { data, error, count } = await c.from('products').upsert(products)
 
-  //   if (error) throw new Error(error.message)
   if (error) {
     logEvent({
       tag: 'upsertProducts',
-      message: `upsertProducts caught error: ${error.message})`,
+      message: `upsertProducts error: ${error.message})`,
       level: 'error',
     })
   }
