@@ -84,7 +84,13 @@ async function updateStockLevels(
       level: 'debug',
     })
     const client = getSupabaseServiceRoleClient()
-    await upsertProducts({ client, products })
+    const result = await upsertProducts({ client, products })
+    await logEvent({
+      tag,
+      message: `after upsert product count: ${result.count}`,
+      data: JSON.stringify({ result }),
+      level: 'debug',
+    })
   } else {
     await logEvent({
       tag,

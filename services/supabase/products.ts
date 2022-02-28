@@ -84,7 +84,7 @@ export async function upsertProducts(props: {
     level: 'debug',
     data: JSON.stringify({ data, error, count }),
   })
-  return data
+  return { data, error, count }
 }
 
 export async function updateProductCountOnHand(props: {
