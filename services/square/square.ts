@@ -331,7 +331,7 @@ export async function mapSqCatalogToProducts(
         item.itemData?.variations[0].itemVariationData?.priceMoney?.amount) ||
       0
     const u_price = +(parseInt(`${priceMaybeBigInt}`) / 100).toFixed(2) // oh money numberz
-    const unit = `${item.standardUnitDescription?.name || 'Each'}`
+    const unit_type = `${item.standardUnitDescription?.name || 'EA'}`
     const sku =
       item.itemData?.variations &&
       item.itemData.variations[0].itemVariationData?.sku
@@ -343,18 +343,20 @@ export async function mapSqCatalogToProducts(
     const id = getIdFromCAVorSKU(cav, sku)
 
     const { category, sub_category } = await parseCategory(item)
-    return {
+
+    const product: Product = {
       id,
       ...parseNameAndDesc(item),
       category,
       sub_category,
       u_price,
-      unit,
+      unit_type,
       count_on_hand: item.quantity,
       upc_code: sku,
       sq_variation_id: variation_id,
       ...cav,
     }
+    return product
   })
   return Promise.all(catalogMap)
 }
