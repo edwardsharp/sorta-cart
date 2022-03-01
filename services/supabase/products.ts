@@ -75,13 +75,13 @@ export async function upsertProducts(props: {
   const { data, error, count } = await c.from('products').upsert(products)
 
   if (error) {
-    logEvent({
+    await logEvent({
       tag: 'upsertProducts',
       message: `upsertProducts error: ${error.message})`,
       level: 'error',
     })
   }
-  logEvent({
+  await logEvent({
     tag: 'upsertProducts',
     message: `upsertProducts result count: ${count})`,
     level: 'debug',
@@ -108,20 +108,38 @@ export async function createOrUpdateProducts(props: {
     if (productCount) {
       // product exists, just update a couple properties
       const { count_on_hand, sq_variation_id } = product
-      await c
+      const { error } = await c
         .from<Product>('products')
         .update({ count_on_hand, sq_variation_id }, { returning: 'minimal' })
         .eq('id', product.id)
-      createdProducts += 1
+      if (error) {
+        await logEvent({
+          tag: 'createOrUpdateProducts',
+          message: `update error: ${error.message})`,
+          level: 'error',
+          data: JSON.stringify({ error }),
+        })
+      } else {
+        createdProducts += 1
+      }
     } else {
-      await c
+      const { error } = await c
         .from<Product>('products')
         .insert(product, { returning: 'minimal' })
-      updatedProducts += 1
+      if (error) {
+        await logEvent({
+          tag: 'createOrUpdateProducts',
+          message: `insert error: ${error.message})`,
+          level: 'error',
+          data: JSON.stringify({ error }),
+        })
+      } else {
+        updatedProducts += 1
+      }
     }
   }
 
-  logEvent({
+  await logEvent({
     tag: 'createOrUpdateProducts',
     message: `createOrUpdateProducts result createdProducts: ${createdProducts}, updatedProducts: ${updatedProducts}`,
   })
@@ -141,7 +159,7 @@ export async function updateProductCountOnHand(props: {
 
   //   if (error) throw new Error(error.message)
   if (error) {
-    logEvent({
+    await logEvent({
       tag: 'updateProductCountOnHand',
       message: `updateProductCountOnHand caught error: ${error.message})`,
       level: 'error',
