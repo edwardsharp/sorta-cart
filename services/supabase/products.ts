@@ -90,6 +90,43 @@ export async function upsertProducts(props: {
   return { data, error, count }
 }
 
+export async function createOrUpdateProducts(props: {
+  products: Product[]
+  client?: SupabaseClient
+}) {
+  const { client, products } = props
+  const c = client ? client : supabase
+
+  let createdProducts = 0
+  let updatedProducts = 0
+
+  for await (const product of products) {
+    const { count: productCount } = await c
+      .from('products')
+      .select('id')
+      .eq('id', product.id)
+    if (productCount) {
+      // product exists, just update a couple properties
+      const { count_on_hand, sq_variation_id } = product
+      await c
+        .from<Product>('products')
+        .update({ count_on_hand, sq_variation_id }, { returning: 'minimal' })
+        .eq('id', product.id)
+      createdProducts += 1
+    } else {
+      await c
+        .from<Product>('products')
+        .insert(product, { returning: 'minimal' })
+      updatedProducts += 1
+    }
+  }
+
+  logEvent({
+    tag: 'createOrUpdateProducts',
+    message: `createOrUpdateProducts result createdProducts: ${createdProducts}, updatedProducts: ${updatedProducts}`,
+  })
+}
+
 export async function updateProductCountOnHand(props: {
   variation_id: string
   count_on_hand: number

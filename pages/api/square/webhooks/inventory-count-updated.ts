@@ -6,9 +6,9 @@ import {
 } from '../../../../services/square/square'
 
 import { InventoryCountUpdatedWebhook } from '../../../../types/square'
+import { createOrUpdateProducts } from '../../../../services/supabase/products'
 import { getSupabaseServiceRoleClient } from '../../../../services/supabase/supabase'
 import { logEvent } from '../../../../services/supabase/events'
-import { upsertProducts } from '../../../../services/supabase/products'
 
 type Data = {
   ok: boolean
@@ -79,18 +79,12 @@ async function updateStockLevels(
   if (products.length) {
     await logEvent({
       tag,
-      message: `gonna try to upsert ${products.length} products (from catalogObjectIds.length: ${catalogObjectIds.length}) to supabase...`,
+      message: `updateStockLevels gonna try to createOrUpdateProducts ${products.length} products (from catalogObjectIds.length: ${catalogObjectIds.length}) to db...`,
       data: JSON.stringify({ products, inventoryCountUpdatedWebhookData }),
       level: 'debug',
     })
     const client = getSupabaseServiceRoleClient()
-    const result = await upsertProducts({ client, products })
-    await logEvent({
-      tag,
-      message: `after upsert product count: ${result.count}`,
-      data: JSON.stringify({ result }),
-      level: 'debug',
-    })
+    await createOrUpdateProducts({ client, products })
   } else {
     await logEvent({
       tag,
