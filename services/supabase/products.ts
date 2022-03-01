@@ -103,7 +103,7 @@ export async function createOrUpdateProducts(props: {
   for await (const product of products) {
     const { count: productCount } = await c
       .from('products')
-      .select('id')
+      .select('id', { count: 'exact' })
       .eq('id', product.id)
     if (productCount) {
       // product exists, just update a couple properties

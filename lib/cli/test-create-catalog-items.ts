@@ -1,15 +1,15 @@
 #!/usr/bin/env ts-node
 
+import { addProductToCatalog } from '../../services/square'
 import dotenv from 'dotenv'
 import path from 'path'
+import superjson from 'superjson'
 
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config({ path: path.resolve(process.cwd(), '.env.local') })
 }
 
-import superjson from 'superjson'
 
-import { addProductToCatalog } from '../../services/square'
 
 const main = async () => {
   // gawd need to delete UGXILB5H64X7C5NDPOEJDR2W and D4IGOKEF6P4QJO4EEP26K2DP
