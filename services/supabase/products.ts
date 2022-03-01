@@ -120,7 +120,7 @@ export async function createOrUpdateProducts(props: {
           data: JSON.stringify({ error }),
         })
       } else {
-        createdProducts += 1
+        updatedProducts += 1
       }
     } else {
       const { error } = await c
@@ -134,7 +134,7 @@ export async function createOrUpdateProducts(props: {
           data: JSON.stringify({ error }),
         })
       } else {
-        updatedProducts += 1
+        createdProducts += 1
       }
     }
   }
