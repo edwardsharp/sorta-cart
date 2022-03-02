@@ -8,6 +8,7 @@ import {
 import { LineItemWithProductData } from '../../../types/supatypes'
 import { createPayment } from '../../../services/square/payments'
 import { defaultCorsMiddleware } from '../../../lib/cors-middleware'
+import { emailOrderReceipt } from '../../../lib/email-order-receipt'
 import { getSupabaseServiceRoleClient } from '../../../services/supabase/supabase'
 
 type Data = {
@@ -56,6 +57,9 @@ export default async function handler(
   if (ok && data) {
     // update order payment_status and create payment order line item.
     await updateOrderPayment(api_key, { total: total, data }, client)
+
+    // send email...
+    await emailOrderReceipt(order.api_key)
   }
 
   res.status(200).json({ ok })

@@ -1,5 +1,6 @@
+import { LineItem, Order, SupaOrderWithLineItems } from '../../types/supatypes'
+
 import { SupabaseClient } from '@supabase/supabase-js'
-import { LineItem, SupaOrderWithLineItems, Order } from '../../types/supatypes'
 import { supabase } from './supabase'
 
 export async function getOrderForApiKey(
@@ -14,13 +15,9 @@ export async function getOrderForApiKey(
     .eq('api_key', api_key)
     .single()
 
-  console.log(
-    'getOrderForApiKey, email:',
-    api_key,
-    ' data, error, count',
-    error,
-    data
-  )
+  if (error) {
+    console.warn('getOrderForApiKey error!', error)
+  }
 
   return { order: data, error }
 }
