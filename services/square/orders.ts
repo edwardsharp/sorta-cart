@@ -4,10 +4,11 @@ import {
   OrderLineItemDiscount,
   OrderLineItemTax,
 } from 'square'
-import { randomUUID } from 'crypto'
-import { client } from './client'
+
 import { LineItemWithProductData } from '../../types/supatypes'
+import { client } from './client'
 import { getDefaultLocationId } from './locations'
+import { randomUUID } from 'crypto'
 
 const { ordersApi } = client
 
@@ -129,10 +130,18 @@ export function mapLineItems(
   return line_items
     .filter((li) => li.kind === 'product' || li.kind === 'adjustment')
     .map((li) => {
-      let catalogObjectId = undefined
       const data = tryParseJSON(li.data)
       if (data?.product?.sq_variation_id) {
-        catalogObjectId = data.product.sq_variation_id
+        // special handling if this is a square product (i.e. there's a sq_variation_id)
+        return {
+          // note: with catalogObjectId, do not include name!
+          quantity: `${li.quantity}`,
+          basePriceMoney: {
+            amount: toCents(li.price),
+            currency: 'USD',
+          },
+          catalogObjectId: data.product.sq_variation_id,
+        }
       }
       return {
         name: li.description || '',
@@ -141,7 +150,6 @@ export function mapLineItems(
           amount: toCents(li.price),
           currency: 'USD',
         },
-        catalogObjectId,
       }
     })
 }
