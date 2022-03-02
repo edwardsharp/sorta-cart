@@ -1,5 +1,6 @@
 import Handlebars from 'handlebars/dist/cjs/handlebars'
 import { SupaOrderWithLineItems } from '../types/supatypes'
+import { format } from 'date-fns'
 import { getOrderForApiKey } from '../services/supabase/orders'
 import { getSupabaseServiceRoleClient } from '../services/supabase/supabase'
 
@@ -149,7 +150,7 @@ const printTemplate = `
       <tr>
         <td colspan="6">
           <b>created at</b>
-          <span class="date">{{createdAt}}</span>
+          <span class="date">{{orderDate}}</span>
         </td>
       </tr>
 
@@ -245,7 +246,7 @@ const printTemplate = `
       {{#each_when OrderLineItems "kind" "tax"}}
       <tr class="li">
         <td align="center">{{vendor}}</td>
-        <td>{{description}}</td>
+        <td>Tax {{description}}</td>
         <td colspan="3"></td>
         <td align="right">{{total}}</td>
       </tr>
@@ -345,6 +346,9 @@ function orderEmailTemplate(order: SupaOrderWithLineItems) {
   const orders = [
     {
       ...order,
+      orderDate: order.createdAt
+        ? format(new Date(order.createdAt), 'PPPPpppp')
+        : '',
       onHandProducts,
       backorderProducts,
     },
