@@ -74,7 +74,7 @@ async function handleNewOrderAndPayment(
   const lineItems = mapLineItems(orderLineItems)
 
   const orderResponse = await createOrder({
-    referenceId: `TEST ORDER ${Date.now()}`,
+    referenceId: `ORDER ${Date.now()}`,
     lineItems,
     name: name,
   })

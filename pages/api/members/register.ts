@@ -1,13 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import { defaultCorsMiddleware } from '../../../lib/cors-middleware'
-import { insertMember } from '../../../services/supabase/members'
-import { getSupabaseServiceRoleClient } from '../../../services/supabase/supabase'
 import { Member } from '../../../types/supatypes'
+import { createPayment } from '../../../services/square/payments'
+import { defaultCorsMiddleware } from '../../../lib/cors-middleware'
+import { getSupabaseServiceRoleClient } from '../../../services/supabase/supabase'
+import { insertMember } from '../../../services/supabase/members'
 
 type Data = {
   member: Member | null
   msg: string
+  user?: any | null
 }
 export default async function handler(
   req: NextApiRequest,
@@ -15,15 +17,47 @@ export default async function handler(
 ) {
   await defaultCorsMiddleware(req, res)
 
-  // const { member, user, nonce } = req.body
-
-  // #TODO: process payment, create user, assoc with member before insertMember
+  // console.log('[api/members/register] req.body:', req.body)
+  const { member: newMember, user: newUser, sourceId } = req.body
 
   try {
+    const amountCents = Math.round(newMember.fees_paid * 100)
+    const paymentResponse = await createPayment({
+      sourceId,
+      amountCents,
+    })
+
+    // console.log(
+    //   '[api/members/register] square payment result:',
+    //   paymentResponse
+    // )
+
     const client = getSupabaseServiceRoleClient()
-    const { member, msg } = await insertMember(req.body.member, client)
+
+    const { data: user, error } = await client.auth.api.createUser({
+      email: newUser.email,
+      data: { role: 'member' },
+    })
+
+    // console.log('[api/members/register]  createUser error, user:', error, user)
+    if (error || !user) {
+      res.status(200).json({ member: null, msg: 'unable to create member!' })
+      return
+    }
+
+    const { member, msg } = await insertMember(
+      { ...newMember, UserId: user.id },
+      client
+    )
+    // console.log(
+    //   '[api/members/register] insertMember msg, member:',
+    //   msg,
+    //   member,
+    //   user
+    // )
+
     if (member) {
-      res.status(200).json({ member, msg })
+      res.status(200).json({ member, msg: 'ok', user })
     } else {
       res.status(200).json({ member: null, msg: 'unable to create member!' })
     }
