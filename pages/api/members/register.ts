@@ -36,7 +36,6 @@ export default async function handler(
 
     const { data: user, error } = await client.auth.api.createUser({
       email: newUser.email,
-      data: { role: 'member' },
     })
 
     // console.log('[api/members/register]  createUser error, user:', error, user)
@@ -44,6 +43,11 @@ export default async function handler(
       res.status(200).json({ member: null, msg: 'unable to create member!' })
       return
     }
+
+    //const { data: updateUserData, error: updateUserError } =
+    await client.auth.api.updateUserById(user.id, {
+      user_metadata: { marsh_role: 'member' },
+    })
 
     const { member, msg } = await insertMember(
       { ...newMember, UserId: user.id },
